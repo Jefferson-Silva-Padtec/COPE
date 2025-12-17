@@ -175,6 +175,21 @@ body {
     color: var(--accent-color);
 }
 
+/* --- Badge New (Estrela pequena) --- */
+.badge-nav-new {
+    display: inline-block;
+    color: #FFD700;
+    font-size: 0.7em;
+    margin-left: 8px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.nav-new:hover .badge-nav-new {
+    color: #FFA500;
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+}
+
 /* --- Efeito 3D/Shadow no Título "Iniciar" --- */
 .content h1.title-3d {
     font-size: 6em;
@@ -205,16 +220,17 @@ html[data-theme="light"] .content h1.title-3d {
 /* --- Blocos (Cards) Interativos --- */
 .card-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 30px;
-    padding: 0 20px;
-    margin-top: 50px;
-    margin-bottom: 50px;
+    padding: 10px 20px 30px 20px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    justify-content: center;
 }
 
 .card-link {
     text-decoration: none;
-    color: inherit; 
+    color: inherit;
     display: block;
     width: 100%;
     height: 100%;
@@ -224,11 +240,12 @@ html[data-theme="light"] .content h1.title-3d {
     background-color: rgba(70, 130, 180, 0.1);
     border: 1px solid var(--border-color);
     border-radius: 12px;
-    padding: 30px;
-    min-height: 250px;
-    height: 100%;
+    padding: 18px;
+    width: 100%;
+    aspect-ratio: 4 / 3; /* mantém proporção horizontal */
+    max-width: 384px; /* tamanho máximo (20% maior) em telas grandes */
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     position: relative;
     overflow: hidden;
     display: flex;
@@ -236,6 +253,20 @@ html[data-theme="light"] .content h1.title-3d {
     justify-content: center;
     align-items: center;
     box-sizing: border-box;
+}
+
+/* Breakpoints para redimensionamento automático */
+@media (max-width: 1400px) {
+    .card-container { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 1000px) {
+    .card-container { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+    .card-container { grid-template-columns: 1fr; gap: 20px; padding: 10px; }
+    .card { padding: 14px; }
 }
 
 /* Efeito Hover Interativo */
@@ -361,4 +392,36 @@ html[data-theme="light"] .content h1.title-3d {
     z-index: 10;
     font-weight: bold;
     color: var(--accent-color);
+}
+
+/* --- Card Destaque (Agente COPE) --- */
+.card-featured {
+    border: 3px solid #FFD700;
+    box-shadow: 0 0 35px rgba(255, 215, 0, 0.5), 0 8px 16px rgba(0, 0, 0, 0.5);
+}
+
+.card-featured:hover {
+    border-color: #FFA500;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8), 0 15px 30px rgba(0, 0, 0, 0.7);
+}
+
+html[data-theme="light"] .card-featured {
+    border: 3px solid #FFB90F;
+}
+
+/* --- Badge NOVIDADE --- */
+.badge-novidade {
+    position: absolute;
+    top: -03px;
+    right: 20px;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #000000;
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 10px rgba(255, 215, 0, 0.5);
+    z-index: 10;
 }
