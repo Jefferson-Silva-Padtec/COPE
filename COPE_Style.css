@@ -1,0 +1,364 @@
+/* Variáveis para controle de tema (Fundo preto, letras azul claro) */
+:root {
+    /* Tema Escuro Padrão */
+    --background-color: #000000; /* Fundo preto */
+    --text-color: #87ceeb; /* Azul claro para texto */
+    --accent-color: #00bfff; /* Azul mais vibrante para destaque */
+    --accent-color-hover: #1e90ff; /* Azul médio para hover */
+    --card-background: #161b22; /* Fundo dos blocos */
+    --border-color: #30363d;
+    --sidebar-width: 250px;
+    --sidebar-width-collapsed: 60px;
+    --table-header-bg: #0d1117; /* Fundo da célula de cabeçalho da tabela */
+}
+
+/* Tema Claro (Ajustado para alternância funcional) */
+html[data-theme="light"] {
+    --background-color: #ffffff; /* Fundo branco para tema claro */
+    --text-color: #333333; /* Texto escuro */
+    --accent-color: #007bff; /* Azul para destaque */
+    --accent-color-hover: #0056b3;
+    --card-background: #f8f9fa;
+    --border-color: #dee2e6;
+    --table-header-bg: #e9ecef;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    transition: background-color 0.3s, color 0.3s;
+    display: flex;
+    min-height: 100vh;
+    zoom: 90%;
+}
+
+.content {
+    flex-grow: 1; /* Permite que o conteúdo ocupe o espaço restante */
+    padding: 20px;
+    margin-left: var(--sidebar-width); /* Ajusta para começar após a sidebar expandida */
+    transition: margin-left 0.3s ease;
+}
+
+/* Ajuste o conteúdo quando a sidebar está recolhida */
+.sidebar.collapsed ~ .content {
+    margin-left: var(--sidebar-width-collapsed); 
+}
+
+
+/* --- Botão de Alternância de Tema --- */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--card-background);
+    border: 2px solid var(--accent-color);
+    color: var(--accent-color);
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    font-size: 1.2em;
+    z-index: 100;
+    transition: all 0.3s;
+}
+
+.theme-toggle:hover {
+    background-color: var(--accent-color);
+    color: var(--background-color);
+    box-shadow: 0 0 10px var(--accent-color);
+}
+
+
+/* --- Sidebar (Menu Lateral) --- */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--card-background);
+    padding: 15px 10px;
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.3);
+    transition: width 0.3s ease, background-color 0.3s;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border-color);
+    height: 100vh;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    position: fixed; /* Fixa a sidebar */
+    top: 0;
+    left: 0;
+    z-index: 50;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 10px;
+}
+
+.sidebar-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--accent-color);
+    white-space: nowrap;
+    transition: opacity 0.3s; /* Adicionado para transição de ocultação */
+}
+
+.toggle-sidebar-btn {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.3s;
+}
+
+.toggle-sidebar-btn:hover {
+    color: var(--accent-color);
+}
+
+/* Estado de Sidebar Recolhida */
+.sidebar.collapsed {
+    width: var(--sidebar-width-collapsed);
+    /* Garante que o menu principal comece recolhido */
+}
+
+.sidebar.collapsed .sidebar-title {
+    opacity: 0; /* Suaviza a ocultação do título */
+    width: 0;
+    overflow: hidden;
+    padding: 0;
+}
+
+.sidebar.collapsed .sidebar-nav span {
+    display: none;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 20px 0 0 0;
+    margin: 0;
+}
+
+.sidebar-nav li {
+    margin-bottom: 5px;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-radius: 6px;
+    color: #cccccc;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar-nav a i {
+    margin-right: 10px;
+    font-size: 1.1em;
+    width: 20px; /* Garante que os ícones fiquem alinhados */
+    flex-shrink: 0;
+}
+
+.sidebar.collapsed .sidebar-nav a {
+    justify-content: center;
+    padding: 10px 0; /* Ajusta padding para centralizar */
+}
+
+.sidebar.collapsed .sidebar-nav a i {
+    margin-right: 0;
+}
+
+.sidebar-nav a:hover, .sidebar-nav li.active a {
+    background-color: var(--border-color);
+    color: var(--accent-color);
+}
+
+/* --- Efeito 3D/Shadow no Título "Iniciar" --- */
+.content h1.title-3d {
+    font-size: 6em;
+    font-weight: 900;
+    text-transform: uppercase;
+    /* Efeito de "Text Shadow" para simular profundidade (3D/Shadow) */
+    text-shadow: 
+        1px 1px var(--accent-color-hover),
+        2px 2px var(--accent-color-hover),
+        3px 3px var(--accent-color-hover),
+        4px 4px var(--accent-color); /* A cor principal da sombra */
+    color: var(--text-color);
+    padding-left: 20px;
+    margin-bottom: 50px;
+    margin-top: 20px;
+    letter-spacing: 2px;
+    transition: text-shadow 0.3s;
+}
+
+html[data-theme="light"] .content h1.title-3d {
+    text-shadow: 
+        1px 1px #ccc,
+        2px 2px #aaa,
+        3px 3px #888,
+        4px 4px var(--accent-color); 
+}
+
+/* --- Blocos (Cards) Interativos --- */
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    padding: 0 20px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.card-link {
+    text-decoration: none;
+    color: inherit; 
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.card {
+    background-color: rgba(70, 130, 180, 0.1);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 30px;
+    min-height: 250px;
+    height: 100%;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+/* Efeito Hover Interativo */
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7);
+    border-color: var(--accent-color);
+}
+
+.card:hover h2 {
+    transform: scale(1.05);
+}
+
+.card h2 {
+    color: var(--accent-color);
+    margin-top: 0;
+    font-size: 2.5em;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    transition: transform 0.3s;
+}
+
+.card p {
+    color: var(--text-color);
+    opacity: 0.85;
+    transition: opacity 0.3s;
+    text-align: center;
+}
+
+/* Efeito sutil de brilho no hover */
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(0, 191, 255, 0) 0%, rgba(0, 191, 255, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+
+.card:hover::before {
+    opacity: 1;
+}
+
+/* --- Upload Boxes --- */
+.upload-container {
+    display: flex;
+    justify-content: space-around;
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.upload-box {
+    background-color: rgba(70, 130, 180, 0.1);
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 20px; 
+    text-align: center;
+    color: var(--text-color);
+    transition: border-color 0.3s, background-color 0.3s;
+    cursor: pointer;
+    min-height: 200px;
+    width: 45%; 
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+}
+
+.upload-box:hover, .upload-box.drag-over {
+    border-color: var(--accent-color);
+    background-color: rgba(70, 130, 180, 0.2);
+}
+
+.upload-box i {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
+
+.upload-box p.upload-text {
+    margin: 0 0 20px 0;
+}
+
+/* --- Prévia da Tabela --- */
+.preview {
+    margin-top: 20px;
+    max-height: 300px; 
+    overflow: auto; 
+    width: 100%;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.preview table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--text-color);
+    font-size: 0.85em; 
+    table-layout: fixed; 
+}
+
+.preview th, .preview td {
+    border: 1px solid var(--border-color);
+    padding: 5px;
+    text-align: left;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    background-color: var(--card-background); 
+}
+
+.preview th {
+    position: sticky; 
+    top: 0;
+    background-color: var(--table-header-bg);
+    z-index: 10;
+    font-weight: bold;
+    color: var(--accent-color);
+}
