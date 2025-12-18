@@ -37,6 +37,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializa o toggle de tema
     initThemeToggle();
 
+    // --- Funcionalidade de Recolher/Expandir Sidebar ---
+    const sidebar = document.getElementById('sidebar');
+    const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+    
+    if (toggleSidebarBtn && sidebar) {
+        toggleSidebarBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+        });
+    }
+
     // Referências aos elementos
     const uploadBox1 = document.getElementById('upload1');
     const uploadBox2 = document.getElementById('upload2');
@@ -46,8 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const previewContainer2 = document.getElementById('preview2');
 
     // 1. Configura o clique da caixa para abrir o seletor de arquivo
-    uploadBox1.addEventListener('click', () => fileInput1.click());
-    uploadBox2.addEventListener('click', () => fileInput2.click());
+    if (uploadBox1) uploadBox1.addEventListener('click', () => fileInput1.click());
+    if (uploadBox2) uploadBox2.addEventListener('click', () => fileInput2.click());
 
     // Impede que o clique no input acione o clique da caixa, se for o caso
     fileInput1.addEventListener('click', (e) => e.stopPropagation());
