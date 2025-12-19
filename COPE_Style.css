@@ -262,11 +262,15 @@ html[data-theme="light"] .content h1.title-3d {
 
 @media (max-width: 1000px) {
     .card-container { grid-template-columns: repeat(2, 1fr); }
+    .card h2 { font-size: 1.8em; }
+    .card p { font-size: 0.9em; }
 }
 
 @media (max-width: 600px) {
     .card-container { grid-template-columns: 1fr; gap: 20px; padding: 10px; }
-    .card { padding: 14px; }
+    .card { padding: 12px; }
+    .card h2 { font-size: 1.2em; }
+    .card p { font-size: 0.8em; }
 }
 
 /* Efeito Hover Interativo */
@@ -424,4 +428,239 @@ html[data-theme="light"] .card-featured {
     letter-spacing: 1px;
     box-shadow: 0 4px 10px rgba(255, 215, 0, 0.5);
     z-index: 10;
+}
+
+/* ===== EFEITOS INTERATIVOS COM CURSOR ===== */
+
+/* Partículas flutuantes */
+.particle {
+    position: fixed;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+html[data-theme="dark"] .particle {
+    background: rgba(0, 191, 255, 0.6);
+    box-shadow: 0 0 6px rgba(0, 191, 255, 0.8);
+}
+
+html[data-theme="light"] .particle {
+    background: rgba(0, 123, 255, 0.5);
+    box-shadow: 0 0 6px rgba(0, 123, 255, 0.7);
+}
+
+/* Efeito de ripple no clique */
+@keyframes rippleAnimation {
+    0% {
+        width: 20px;
+        height: 20px;
+        opacity: 1;
+    }
+    100% {
+        width: 300px;
+        height: 300px;
+        opacity: 0;
+    }
+}
+
+.ripple {
+    border: 2px solid var(--accent-color) !important;
+    animation: rippleAnimation 0.6s ease-out !important;
+}
+
+/* Glow nos cards ao passar o cursor */
+.card-light {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(0, 191, 255, 0.3) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+    z-index: 2;
+}
+
+html[data-theme="light"] .card-light {
+    background: radial-gradient(circle, rgba(0, 123, 255, 0.2) 0%, transparent 70%);
+}
+
+/* Animação suave dos cards */
+.card {
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 191, 255, 0.1), transparent);
+    z-index: 1;
+    transition: left 0.5s ease;
+}
+
+.card:hover::before {
+    left: 100%;
+}
+
+/* Efeito de entrada nas cards */
+@keyframes cardFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card-container .card {
+    animation: cardFadeIn 0.6s ease-out forwards;
+}
+
+.card-container .card:nth-child(1) { animation-delay: 0.1s; }
+.card-container .card:nth-child(2) { animation-delay: 0.2s; }
+.card-container .card:nth-child(3) { animation-delay: 0.3s; }
+.card-container .card:nth-child(4) { animation-delay: 0.4s; }
+.card-container .card:nth-child(5) { animation-delay: 0.5s; }
+.card-container .card:nth-child(6) { animation-delay: 0.6s; }
+
+/* Efeito de brilho pulsante */
+@keyframes glow-pulse {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(0, 191, 255, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(0, 191, 255, 0.6);
+    }
+}
+
+.card:hover {
+    animation: glow-pulse 1.5s ease-in-out;
+}
+
+html[data-theme="light"] .card:hover {
+    animation: glow-pulse 1.5s ease-in-out;
+    animation-duration: 1.5s;
+    box-shadow: 0 0 15px rgba(0, 123, 255, 0.4);
+}
+
+/* Animação de entrada do elemento principal */
+main {
+    animation: mainFadeIn 0.8s ease-out;
+}
+
+@keyframes mainFadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Botões com efeito */
+button {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+button:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* Animação suave dos links */
+a {
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+/* Efeito de entrada para headings */
+h1, h2, h3, h4, h5, h6 {
+    animation: headingSlideIn 0.6s ease-out;
+}
+
+@keyframes headingSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Efeito de flutuação suave */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.card-link .card {
+    animation: cardFadeIn 0.6s ease-out forwards, float 3s ease-in-out infinite;
+    animation-delay: 0s, 0s;
+}
+
+/* Scroll smooth */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Efeito de fade no upload box */
+.upload-box {
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: uploadBoxFadeIn 0.6s ease-out;
+}
+
+@keyframes uploadBoxFadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Efeito de brilho animado no tema escuro */
+html[data-theme="dark"] body {
+    position: relative;
+}
+
+/* Transição suave entre temas */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
