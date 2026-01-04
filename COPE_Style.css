@@ -8,7 +8,7 @@
     --card-background: #161b22; /* Fundo dos blocos */
     --border-color: #30363d;
     --sidebar-width: 250px;
-    --sidebar-width-collapsed: 60px;
+    --sidebar-width-collapsed: 66px;
     --table-header-bg: #0d1117; /* Fundo da célula de cabeçalho da tabela */
 }
 
@@ -73,26 +73,90 @@ body {
 /* --- Sidebar (Menu Lateral) --- */
 .sidebar {
     width: var(--sidebar-width);
-    background-color: var(--card-background);
+    background-color: rgba(22, 27, 34, 0.20);
     padding: 15px 10px;
     box-shadow: 4px 0 10px rgba(0, 0, 0, 0.3);
-    transition: width 0.3s ease, background-color 0.3s;
+    transition: width 0.3s ease, background-color 0.3s ease;
     flex-shrink: 0;
     border-right: 1px solid var(--border-color);
     height: 100vh;
+    min-height: 100%;
     box-sizing: border-box;
     overflow-x: hidden;
+    overflow-y: auto;
     position: fixed; /* Fixa a sidebar */
     top: 0;
+    bottom: 0;
     left: 0;
     z-index: 50;
+    backdrop-filter: blur(5px);
+}
+
+/* Logo colocado inline ao lado do botão */
+.sidebar-header .sidebar-logo-inline {
+    max-width: 140px;
+    max-height: 40px;
+    width: auto;
+    height: auto;
+    margin-right: 10px;
+}
+
+/* Tema claro: letras do menu lateral cinza escuro */
+html[data-theme="light"] .sidebar-nav a {
+    color: #333333;
+}
+html[data-theme="light"] .sidebar-nav a span {
+    color: #333333;
 }
 
 .sidebar-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     padding-right: 10px;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.sidebar-logo-expanded {
+    max-width: 180px;
+    max-height: 60px;
+    width: 100%;
+    height: auto;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    object-fit: contain;
+}
+
+.sidebar.collapsed .sidebar-logo-expanded {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-logo-collapsed {
+    width: 28px;
+    height: 28px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    object-fit: contain;
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-logo-collapsed {
+    opacity: 1;
+    display: block;
+}
+
+/* Ao recolher: garantir espaço à direita do header para o botão evitar sobrepor o logo */
+.sidebar.collapsed .sidebar-header {
+    padding-right: 56px; /* espaço reservado para o botão */
+}
+
+.sidebar.collapsed .sidebar-logo-collapsed {
+    margin-right: 48px; /* empurra o logo para a esquerda, deixando espaço para o botão */
 }
 
 .sidebar-title {
@@ -107,14 +171,34 @@ body {
     background: none;
     border: none;
     color: var(--text-color);
-    font-size: 1.5em;
+    font-size: 1.25em;
     cursor: pointer;
-    padding: 5px;
-    transition: color 0.3s;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: color 0.2s, background-color 0.2s;
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 60;
 }
 
 .toggle-sidebar-btn:hover {
     color: var(--accent-color);
+}
+
+/* Garante que o botão mantenha o mesmo tamanho quando a sidebar estiver recolhida */
+.sidebar.collapsed .toggle-sidebar-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    font-size: 1.05em;
+    right: 6px;
 }
 
 /* Estado de Sidebar Recolhida */
@@ -175,6 +259,42 @@ body {
     color: var(--accent-color);
 }
 
+/* --- Seções do Menu --- */
+.nav-section {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.nav-section:last-child {
+    border-bottom: none;
+}
+
+.nav-section-title {
+    font-size: 0.85em;
+    font-weight: bold;
+    color: var(--accent-color);
+    margin: 0 0 10px 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 5px 0;
+    transition: opacity 0.3s;
+}
+
+.sidebar.collapsed .nav-section-title {
+    opacity: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.nav-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
 /* --- Badge New (Estrela pequena) --- */
 .badge-nav-new {
     display: inline-block;
@@ -188,6 +308,34 @@ body {
 .nav-new:hover .badge-nav-new {
     color: #FFA500;
     text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+}
+
+/* --- Estilo laranja para items do menu --- */
+.sidebar-nav a.nav-orange {
+    border: 2px solid #FF8C00;
+    border-radius: 8px;
+    padding: 12px 15px;
+    background-color: rgba(255, 140, 0, 0.08);
+    margin: 5px 0;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+}
+
+.sidebar-nav a.nav-orange span {
+    color: #FF8C00;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-nav a.nav-orange:hover {
+    background-color: rgba(255, 140, 0, 0.15);
+    box-shadow: 0 0 8px rgba(255, 140, 0, 0.3);
+    transform: translateX(2px);
 }
 
 /* --- Efeito 3D/Shadow no Título "Iniciar" --- */
@@ -275,13 +423,12 @@ html[data-theme="light"] .content h1.title-3d {
 
 /* Efeito Hover Interativo */
 .card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7);
-    border-color: var(--accent-color);
+  box-shadow: 0 0 20px rgba(255, 255, 0, 0.6); /* Cria um brilho amarelado */
+  transform: translateY(-5px); /* Opcional: faz o card subir um pouquinho */
 }
 
 .card:hover h2 {
-    transform: scale(1.05);
+    transform: translateY(-5px); /* Opcional: faz o card subir um pouquinho */
 }
 
 .card h2 {
@@ -305,19 +452,23 @@ html[data-theme="light"] .content h1.title-3d {
 
 /* Efeito sutil de brilho no hover */
 .card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(45deg, rgba(0, 191, 255, 0) 0%, rgba(0, 191, 255, 0.1) 100%);
-    opacity: 0;
-    transition: opacity 0.4s;
+    display: none !important;
 }
 
-.card:hover::before {
-    opacity: 1;
+/* --- Variante laranja suave para alguns cards --- */
+.card.card-orange {
+    background-color: rgba(255, 165, 0, 0.06);
+    border-color: rgba(255, 165, 0, 0.18);
+}
+.card.card-orange h2 {
+    color: #ff8c00; /* laranja suave */
+}
+.card.card-orange p {
+    color: var(--text-color);
+}
+.card.card-orange:hover {
+    box-shadow: 0 15px 30px rgba(255, 140, 0, 0.15);
+    border-color: rgba(255, 140, 0, 0.6);
 }
 
 /* --- Upload Boxes --- */
@@ -524,15 +675,20 @@ html[data-theme="light"] .card-light {
 }
 
 .card-container .card {
-    animation: cardFadeIn 0.6s ease-out forwards;
+    /* Desabilita animações de entrada e movimentos das cards */
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
 }
 
-.card-container .card:nth-child(1) { animation-delay: 0.1s; }
-.card-container .card:nth-child(2) { animation-delay: 0.2s; }
-.card-container .card:nth-child(3) { animation-delay: 0.3s; }
-.card-container .card:nth-child(4) { animation-delay: 0.4s; }
-.card-container .card:nth-child(5) { animation-delay: 0.5s; }
-.card-container .card:nth-child(6) { animation-delay: 0.6s; }
+.card-container .card:nth-child(1),
+.card-container .card:nth-child(2),
+.card-container .card:nth-child(3),
+.card-container .card:nth-child(4),
+.card-container .card:nth-child(5),
+.card-container .card:nth-child(6) {
+    animation: none !important;
+}
 
 /* Efeito de brilho pulsante */
 @keyframes glow-pulse {
@@ -545,13 +701,12 @@ html[data-theme="light"] .card-light {
 }
 
 .card:hover {
-    animation: glow-pulse 1.5s ease-in-out;
+    animation: none !important;
 }
 
 html[data-theme="light"] .card:hover {
-    animation: glow-pulse 1.5s ease-in-out;
-    animation-duration: 1.5s;
-    box-shadow: 0 0 15px rgba(0, 123, 255, 0.4);
+    animation: none !important;
+    box-shadow: none !important;
 }
 
 /* Animação de entrada do elemento principal */
@@ -629,8 +784,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .card-link .card {
-    animation: cardFadeIn 0.6s ease-out forwards, float 3s ease-in-out infinite;
-    animation-delay: 0s, 0s;
+    animation: none !important;
 }
 
 /* Scroll smooth */
@@ -663,4 +817,15 @@ html[data-theme="dark"] body {
 /* Transição suave entre temas */
 * {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* === ESTILOS ESPECÍFICOS PARA PÁGINA LINKS COPE === */
+body.page-links-cope .particle {
+    background: rgba(255, 140, 0, 0.8) !important;
+    box-shadow: 0 0 8px rgba(255, 140, 0, 1) !important;
+}
+
+/* Canvas do glow do cursor em laranja */
+body.page-links-cope #cursor-glow-canvas {
+    filter: hue-rotate(45deg) saturate(1.2) !important;
 }
