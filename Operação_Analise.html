@@ -112,6 +112,18 @@
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 10px; }
+
+        /* Efeito para as caixas de upload "acenderem" */
+.bg-white.p-8.rounded-2xl {
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.bg-white.p-8.rounded-2xl:hover {
+    border-color: #FF8C00;
+    box-shadow: 0 10px 30px rgba(255, 140, 0, 0.2);
+    transform: scale(1.02);
+}
     </style>
 </head>
 
