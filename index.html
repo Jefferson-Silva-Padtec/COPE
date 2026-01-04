@@ -15,17 +15,40 @@
 
     <aside id="sidebar" class="sidebar">
         <div class="sidebar-header">
-            <span class="sidebar-title">Menu Inicial</span>
+            <img id="sidebar-logo-expanded" src="logo-padtec.png" alt="Logo Padtec" class="sidebar-logo-expanded sidebar-logo-inline">
+            <img id="sidebar-logo-collapsed" src="Padtec.png" alt="Padtec" class="sidebar-logo-collapsed">
             <button id="toggle-sidebar-btn" class="toggle-sidebar-btn" aria-label="Expandir/Recolher Menu">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
         <nav class="sidebar-nav">
-            <ul>
-                <li class="active"><a href="index.html"><span><i class="fas fa-home"></i> Home</span></a></li>
-                <li><a href="https://gemini.google.com/gem/b1fe25175fb1?ts=69432093" class="nav-new"><span><i class="fas fa-robot"></i> Agente COPE</span><span class="badge-nav-new">★ new</span></a></li>
-                <li><a href="links_cope.html"><span><i class="fas fa-link"></i> Links COPE</span></a></li>
-            </ul>
+            <!-- Navegação -->
+            <div class="nav-section">
+                <h3 class="nav-section-title">Navegação</h3>
+                <ul>
+                    <li class="active"><a href="index.html"><span><i class="fas fa-home"></i> Home</span></a></li>
+                    <li><a href="https://gemini.google.com/gem/b1fe25175fb1?ts=69432093" class="nav-new"><span><i class="fas fa-robot"></i> Agente COPE</span><span class="badge-nav-new">⭐ new</span></a></li>
+                </ul>
+            </div>
+
+            <!-- Acessos Rápidos -->
+            <div class="nav-section">
+                <h3 class="nav-section-title">Acessos Rápidos</h3>
+                <ul>
+                    <li><a href="links_cope.html"><span><i class="fas fa-link"></i> Links COPE</span></a></li>
+                    <li><a href="links_fibrasil.html"><span><i class="fas fa-link"></i> Links Fibrasil</span></a></li>
+                    <li><a href="lista_de_ferramentas.html"><span><i class="fas fa-tools"></i> Lista de Ferramentas</span></a></li>
+                </ul>
+            </div>
+
+            <!-- Operação & Análise -->
+            <div class="nav-section">
+                <h3 class="nav-section-title">Operação & Análise</h3>
+                <ul>
+                    <li><a href="../Operação_Analise.html" class="nav-orange"><span><i class="fas fa-broom"></i> Analisar Dados</span></a></li>
+                    <li><a href="../Volumetria_COPE.html" class="nav-orange"><span><i class="fas fa-chart-bar"></i> Volumetria COPE</span></a></li>
+                </ul>
+            </div>
         </nav>
     </aside>
 
@@ -37,9 +60,24 @@
                 <p>Novo assistente inteligente para auxiliar você.</p>
             </a>
 
-            <a href="links_cope.html" class="card card-link">
+            <a href="links_cope.html" class="card card-link card-orange">
                 <h2>Links COPE</h2>
                 <p>Coleção de links importantes relacionados a COPE.</p>
+            </a>
+
+            <a href="../Volumetria_COPE.html" class="card card-link card-orange">
+                <h2>Volumetria COPE</h2>
+                <p>Relatórios e dashboards de volumetria.</p>
+            </a>
+
+            <a href="../Operação_Analise.html" class="card card-link card-orange">
+                <h2>Analise e Limpesa de Dados</h2>
+                <p style="font-size:0.95em; margin:0;">Verifica SP/CTO e remove Notificação TA VIVO</p>
+            </a>
+
+            <a href="links_fibrasil.html" class="card card-link">
+                <h2>Links Fibrasil</h2>
+                <p style="font-size:0.9em; margin:0;">Necessário login com usuario .ext@fibrasil</p>
             </a>
         </div>
     </main>
