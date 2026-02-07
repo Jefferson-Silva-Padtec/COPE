@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="Padtec.png" />
+    <link rel="icon" type="image/png" href="img/Padtec.png" />
     <title>COPE | PADTEC</title>
     <link rel="stylesheet" href="COPE_Style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -16,8 +16,8 @@
 
     <aside id="sidebar" class="sidebar">
         <div class="sidebar-header">
-            <img id="sidebar-logo-expanded" src="logo-padtec.png" alt="Logo Padtec" class="sidebar-logo-expanded sidebar-logo-inline">
-            <img id="sidebar-logo-collapsed" src="Padtec.png" alt="Padtec" class="sidebar-logo-collapsed">
+            <img id="sidebar-logo-expanded" src="img/logo-padtec.png" alt="Logo Padtec" class="sidebar-logo-expanded sidebar-logo-inline">
+            <img id="sidebar-logo-collapsed" src="img/Padtec.png" alt="Padtec" class="sidebar-logo-collapsed">
             <button id="toggle-sidebar-btn" class="toggle-sidebar-btn" aria-label="Expandir/Recolher Menu">
                 <i class="fas fa-bars"></i>
             </button>
@@ -27,7 +27,7 @@
             <div class="nav-section">
                 <h3 class="nav-section-title">Navegação</h3>
                 <ul>
-                    <li class="active"><a href="index.html"><i class="fas fa-home"></i> <span>Home</span></a></li>
+                    <li class="active"><a href="#" onclick="navigateTo('home'); return false;"><i class="fas fa-home"></i> <span>Home</span></a></li>
                     <li><a href="https://gemini.google.com/gem/b1fe25175fb1?ts=69432093" class="nav-new"><i class="fas fa-robot"></i> <span>Agente COPE</span><span class="badge-nav-new">⭐ new</span></a></li>
                 </ul>
             </div>
@@ -36,9 +36,9 @@
             <div class="nav-section">
                 <h3 class="nav-section-title">Acessos Rápidos</h3>
                 <ul>
-                    <li><a href="links_cope.html"><i class="fas fa-link"></i> <span>Links COPE</span></a></li>
-                    <li><a href="links_fibrasil.html"><i class="fas fa-link"></i> <span>Links Fibrasil</span></a></li>
-                    <li><a href="lista_de_ferramentas.html"><i class="fas fa-tools"></i> <span>Lista de Ferramentas</span></a></li>
+                    <li><a href="#" onclick="navigateTo('links-cope'); return false;"><i class="fas fa-link"></i> <span>Links COPE</span></a></li>
+                    <li><a href="#" onclick="navigateTo('links-fibrasil'); return false;"><i class="fas fa-link"></i> <span>Links Fibrasil</span></a></li>
+                    <li><a href="#" onclick="navigateTo('ferramentas'); return false;"><i class="fas fa-tools"></i> <span>Lista de Ferramentas</span></a></li>
                 </ul>
             </div>
 
@@ -46,48 +46,196 @@
             <div class="nav-section">
                 <h3 class="nav-section-title">Operação & Análise</h3>
                 <ul>
-                    <li><a href="https://jefferson-silva-padtec.github.io/COPE_ANALISE/" class="nav-orange"><i class="fas fa-broom"></i> <span>Analisar Dados</span></a></li>
-                    <li><a href="https://jefferson-silva-padtec.github.io/COPE_ANALISE/?page=volumetria" class="nav-orange"><i class="fas fa-chart-bar"></i> <span>Volumetria COPE</span></a></li>
+                    <li><a href="https://copeanalise.vercel.app/" class="nav-orange"><i class="fas fa-broom"></i> <span>Analisar Dados</span></a></li>
+                    <li><a href="https://copeanalise.vercel.app/?page=volumetria" class="nav-orange"><i class="fas fa-chart-bar"></i> <span>Volumetria COPE</span></a></li>
                 </ul>
             </div>
         </nav>
     </aside>
 
     <main class="content">
-        <div class="card-container">
-            <a href="https://gemini.google.com/gem/b1fe25175fb1?ts=69432093" class="card card-link card-featured">
-                <span class="badge-novidade">NOVIDADE</span>
-                <h2>Agente COPE</h2>
-                <p>Novo assistente inteligente para auxiliar você.</p>
-            </a>
-            
-            <a href="#" onclick="showEnvioModal(event)" class="card card-link card-orange">
-                <span class="badge-novidade">AUTOMATIZADO</span>
-                <h2>ENVIO PARCIAL</h2>
-                <p>Envio Automatizado.</p>
-            </a>
+        <!-- SEÇÃO: HOME -->
+        <section id="home" class="page-section active">
+            <div class="card-container">
+                <a href="https://gemini.google.com/gem/b1fe25175fb1?ts=69432093" class="card card-link card-featured">
+                    <span class="badge-novidade">NOVIDADE</span>
+                    <h2>Agente COPE</h2>
+                    <p>Novo assistente inteligente para auxiliar você.</p>
+                </a>
+                
+                <a href="#" onclick="showEnvioModal(event)" class="card card-link card-orange">
+                    <span class="badge-novidade">AUTOMATIZADO</span>
+                    <h2>ENVIO PARCIAL</h2>
+                    <p>Envio Automatizado.</p>
+                </a>
 
+                <a href="#" onclick="navigateTo('links-cope'); return false;" class="card card-link card-orange">
+                    <h2>Links COPE</h2>
+                    <p>Coleção de links importantes relacionados a COPE.</p>
+                </a>
 
-            <a href="links_cope.html" class="card card-link card-orange">
-                <h2>Links COPE</h2>
-                <p>Coleção de links importantes relacionados a COPE.</p>
-            </a>
+                <a href="https://copeanalise.vercel.app/?page=volumetria" class="card card-link card-orange">
+                    <h2>Volumetria COPE</h2>
+                    <p>Relatórios e dashboards de volumetria.</p>
+                </a>
 
-            <a href="https://jefferson-silva-padtec.github.io/COPE_ANALISE/?page=volumetria" class="card card-link card-orange">
-                <h2>Volumetria COPE</h2>
-                <p>Relatórios e dashboards de volumetria.</p>
-            </a>
+                <a href="https://copeanalise.vercel.app/" class="card card-link card-orange">
+                    <h2>Analise e Limpesa de Dados</h2>
+                    <p style="font-size:0.95em; margin:0;">Verifica SP/CTO e remove Notificação TA VIVO</p>
+                </a>
 
-            <a href="https://jefferson-silva-padtec.github.io/COPE_ANALISE/" class="card card-link card-orange">
-                <h2>Analise e Limpesa de Dados</h2>
-                <p style="font-size:0.95em; margin:0;">Verifica SP/CTO e remove Notificação TA VIVO</p>
-            </a>
+                <a href="#" onclick="navigateTo('links-fibrasil'); return false;" class="card card-link">
+                    <h2>Links Fibrasil</h2>
+                    <p style="font-size:0.9em; margin:0;">Necessário login com usuario .ext@fibrasil</p>
+                </a>
+            </div>
+        </section>
 
-            <a href="links_fibrasil.html" class="card card-link">
-                <h2>Links Fibrasil</h2>
-                <p style="font-size:0.9em; margin:0;">Necessário login com usuario .ext@fibrasil</p>
-            </a>
-        </div>
+        <!-- SEÇÃO: LINKS COPE -->
+        <section id="links-cope" class="page-section">
+            <h1 style="color: #FF8C00; text-align: center; margin-bottom: 50px; font-size: 4em; font-weight: bold;">COPE</h1>
+
+            <div class="card-container">
+                <a href="#" onclick="showEnvioModal(event)" class="card card-link card-orange">
+                    <span class="badge-novidade">NOVIDADE</span>
+                    <h2>ENVIO PARCIAL</h2>
+                    <p>Envio Automatizado.</p>
+                </a>
+
+                <a class="card-link" href="https://fibrasilferramentas.padtec.com.br/salasdecrise/" aria-label="Abrir SALA DE CRISE">
+                    <div class="card card-orange">
+                        <h2>SALA DE CRISE</h2>
+                        <p>Relatórios Salas de Crise - COPE</p>
+                    </div>
+                </a>
+
+                <a class="card-link" href="https://padtec.sharepoint.com/:x:/r/sites/OperacoesFiBrasil/_layouts/15/Doc.aspx?sourcedoc=%7B5AF4BC0C-8329-48FE-A59C-85E7C5A2E1B7%7D&file=Exemplo%20de%20M%C3%A1scaras.xlsx&action=default&mobileredirect=true" target="_blank" rel="noopener noreferrer" aria-label="Abrir Máscaras">
+                    <div class="card card-orange">
+                        <h2>Máscaras</h2>
+                        <p>Exemplo de Máscaras</p>
+                    </div>
+                </a>
+
+                <a class="card-link" href="https://padtec.sharepoint.com/:x:/r/sites/OperacoesFiBrasil/_layouts/15/Doc.aspx?sourcedoc=%7B5B86580C-689D-49DD-9AAD-3F25C0AC1CDE%7D&file=Tabula%C3%A7%C3%A3o%20Acionamento%20GOLF%20(Escolta).xlsx&action=default&mobileredirect=true&isSPOFile=1&ovuser=5619e9f2-1be6-47b9-8f69-06404094db57%2Cjssantos%40padtec.com.br&clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI0OS8yNTA1MDQwMTYyNCIsIkhhc0ZlZGVyYXRlZFVzZXIiOmZhbHNlfQ%3D%3D" target="_blank" rel="noopener noreferrer" aria-label="Abrir ACIONAMENTO GOLF">
+                    <div class="card card-orange">
+                        <h2>ACIONAMENTO GOLF</h2>
+                        <p>Tabulação Acionamento GOLF (Escolta)</p>
+                    </div>
+                </a>
+
+                <a class="card-link" href="https://padtec.sharepoint.com/:x:/r/sites/OperacoesFiBrasil/_layouts/15/Doc.aspx?sourcedoc=%7B5820AB68-D551-48C0-BB19-56F245F0C1F2%7D&file=Tabula%C3%A7%C3%A3o%20Acionamento%20Supervis%C3%A3o%20e%20Coordena%C3%A7%C3%A3o%20FiBrasil.xlsx&action=default&mobileredirect=true&isSPOFile=1&ovuser=5619e9f2-1be6-47b9-8f69-06404094db57%2Cjssantos%40padtec.com.br&clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI0OS8yNTA1MDQwMTYyNCIsIkhhc0ZlZGVyYXRlZFVzZXIiOmZhbHNlfQ%3D%3D" target="_blank" rel="noopener noreferrer" aria-label="Abrir TABULAÇÃO ACIONAMENTO FIBRASIL">
+                    <div class="card card-orange">
+                        <h2>TABULAÇÃO ACIONAMENTO FIBRASIL</h2>
+                        <p>Planilha de Tabulação - FiBrasil</p>
+                    </div>
+                </a>
+
+                <a class="card-link" href="https://padtec.sharepoint.com/:x:/r/sites/OperacoesFiBrasil/_layouts/15/Doc.aspx?sourcedoc=%7BCBB8CB2E-B28E-4A0D-BF42-FF3DF3992D95%7D&file=Status%20Di%C3%A1rio.xlsx&action=default&mobileredirect=true" target="_blank" rel="noopener noreferrer" aria-label="Abrir STATUS DIARIO">
+                    <div class="card card-orange">
+                        <h2>STATUS DIARIO</h2>
+                        <p>Status Diário - COPE</p>
+                    </div>
+                </a>
+
+                <a class="card-link" href="https://padtec.sharepoint.com/:x:/r/sites/OperacoesFiBrasil/_layouts/15/Doc.aspx?sourcedoc=%7B16D8374A-31DA-4DCC-B49C-F3EFA39705F1%7D&file=Auditoria.xlsx&action=default&mobileredirect=true" target="_blank" rel="noopener noreferrer" aria-label="Abrir AUDITORIA">
+                    <div class="card card-orange">
+                        <h2>AUDITORIA</h2>
+                        <p>Planilha Auditoria</p>
+                    </div>
+                </a>
+
+                <a class="card-link" href="https://padtec.sharepoint.com/:x:/r/sites/OperacoesFiBrasil/_layouts/15/Doc.aspx?sourcedoc=%7B" target="_blank" rel="noopener noreferrer" aria-label="Abrir SOBREAVISO PE">
+                    <div class="card card-orange">
+                        <h2>SOBREAVISO PLANTA EXTERNA</h2>
+                        <p>Sobreaviso Rede Externa_Ver.5- 2025_02062025.xlsx</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: LINKS FIBRASIL -->
+        <section id="links-fibrasil" class="page-section">
+            <h1 style="color: #00b7ff; text-align: center; margin-bottom: 50px; font-size: 4em; font-weight: bold;">FIBRASIL</h1>
+
+            <div class="card-container">
+                <a class="card-link" href="https://fibrasilcorp.sharepoint.com/:x:/r/sites/OPERAESFIBRASIL/_layouts/15/doc2.aspx?sourcedoc=%7BC250FBDD-3153-4EB8-90C2-1328C504D5B3%7D&file=Sobreaviso%20Rede%20Externa_Ver.5-%202025_02062025.xlsx&action=default&mobileredirect=true" target="_blank" rel="noopener noreferrer" aria-label="Abrir SOBREAVISO PE">
+                    <div class="card">
+                        <h2>SOBREAVISO PLANTA EXTERNA</h2>
+                        <p>Sobreaviso Rede Externa_Ver.5- 2025_02062025.xlsx</p>
+                    </div>
+                </a>
+
+                <a class="card-link" href="https://app.powerbi.com/groups/me/apps/6506522b-dc4a-47fb-9fb7-d785bac4c40d/reports/faf20964-4999-4b72-af50-7251726fcb60/7fd4ff817170b19d1a60?ctid=df1b464d-c105-4b6b-95c1-c07df632da76&experience=power-bi" target="_blank" rel="noopener noreferrer" aria-label="Abrir BI Indisponibilidade">
+                    <div class="card">
+                        <h2>BI Indisponibilidade</h2>
+                        <p>Relatório BI de indisponibilidade</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: LISTA DE FERRAMENTAS -->
+        <section id="ferramentas" class="page-section">
+            <h1 style="color: #00b7ff; text-align: center; margin-bottom: 40px; font-size: 4em; font-weight: bold;">Ferramentas</h1>
+
+            <div class="card-container">
+                <a class="card-link" href="https://am.fibrasil.com.br/" target="_blank" rel="noopener noreferrer" aria-label="Alarm Manager">
+                    <div class="card mini">
+                        <img src="img/Alarm Manager.png" alt="Alarm Manager">
+                        <h2>Alarm Manager</h2>
+                    </div>
+                </a>
+
+                <a class="card-link" href="https://sigo.fibrasil.com.br/" target="_blank" rel="noopener noreferrer" aria-label="Sigo">
+                    <div class="card mini">
+                        <img src="img/Sigo.png" alt="Sigo">
+                        <h2>Sigo</h2>
+                    </div>
+                </a>
+
+                <a class="card-link" href="https://naf.fibrasil.com.br/naf/login" target="_blank" rel="noopener noreferrer" aria-label="NAF">
+                    <div class="card mini">
+                        <img src="img/NAF.png" alt="NAF">
+                        <h2>NAF</h2>
+                    </div>
+                </a>
+
+                <a class="card-link" href="https://portal.fibrasil.com.br/locator" target="_blank" rel="noopener noreferrer" aria-label="Locator">
+                    <div class="card mini">
+                        <img src="img/Locator.png" alt="Locator">
+                        <h2>Locator</h2>
+                    </div>
+                </a>
+
+                <a class="card-link" href="https://fibrasil.clouditservice.com.br/zabbix.php?action=dashboard.list" target="_blank" rel="noopener noreferrer" aria-label="Zabbix">
+                    <div class="card mini">
+                        <img src="img/Zabbix.png" alt="Zabbix">
+                        <h2>Zabbix</h2>
+                    </div>
+                </a>
+
+                <a class="card-link" href="https://netwin.fibrasil.com.br/portal/netwin" target="_blank" rel="noopener noreferrer" aria-label="Netwin">
+                    <div class="card mini">
+                        <img src="img/netwin.png" alt="Netwin">
+                        <h2>Netwin</h2>
+                    </div>
+                </a>
+
+                <a class="card-link" href="https://padtec.saycm.yeastarcloud.com/" target="_blank" rel="noopener noreferrer" aria-label="PBX">
+                    <div class="card mini">
+                        <img src="img/PBX.png" alt="PBX">
+                        <h2>PBX</h2>
+                    </div>
+                </a>
+
+                <a class="card-link" href="#" target="_blank" rel="noopener noreferrer" aria-label="Mais">
+                    <div class="card mini">
+                        <i class="fas fa-ellipsis-h" aria-hidden="true"></i>
+                        <h2>Mais</h2>
+                    </div>
+                </a>
+            </div>
+        </section>
     </main>
 
     <!-- Modal de Confirmação Envio Parcial -->
@@ -110,7 +258,7 @@
         function handleEnvioEscolha(limpar) {
             document.getElementById('envio-modal').style.display = 'none';
             if (limpar) {
-                window.open("https://jefferson-silva-padtec.github.io/COPE_ANALISE/", "_blank");
+                window.open("https://copeanalise.vercel.app/", "_blank");
             } else {
                 window.open("https://parcialcopepadtec.streamlit.app/", "_blank");
             }
@@ -125,7 +273,6 @@
     </script>
 
     <script src="COPE.js"></script>
-    <script src="interactive-effects.js"></script>
+    <script src="../interactive-effects.js"></script>
 </body>
 </html>
-
