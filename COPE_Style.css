@@ -829,3 +829,59 @@ body.page-links-cope .particle {
 body.page-links-cope #cursor-glow-canvas {
     filter: hue-rotate(45deg) saturate(1.2) !important;
 }
+
+/* === ESTILOS UNIFICADOS (SPA) === */
+.page-section {
+    display: none;
+    animation: mainFadeIn 0.5s ease-out;
+}
+
+.page-section.active {
+    display: block;
+}
+
+/* Estilos específicos da Lista de Ferramentas (Cards Mini) */
+#ferramentas .card-container { 
+    gap: 10px; 
+    padding: 8px 12px; 
+}
+
+#ferramentas .card.mini { 
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
+    height: 48px !important;
+    max-width: 320px !important;
+    padding: 6px 8px !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.35) !important;
+}
+
+#ferramentas .card.mini img { 
+    width: 28px !important; 
+    height: 28px !important; 
+    margin: 0 !important; 
+}
+
+#ferramentas .card.mini i { 
+    width: 28px; 
+    font-size: 20px; 
+    text-align: center; 
+    color: var(--accent-color); 
+    flex-shrink: 0; 
+}
+
+#ferramentas .card.mini h2 { 
+    font-size: 0.95rem !important; 
+    text-transform: none !important; 
+    margin: 0 !important; 
+    color: var(--accent-color) !important; 
+}
+
+#ferramentas .card.mini p { 
+    display: none !important; 
+}
+
+#ferramentas .card { 
+    font-size: 0.85rem; 
+}
