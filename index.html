@@ -6,7 +6,7 @@
     <link rel="icon" type="image/png" href="Padtec.png" />
     <title>COPE | PADTEC</title>
     <link rel="stylesheet" href="COPE_Style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 
@@ -145,7 +145,7 @@
                     </div>
                 </a>
 
-                <a class="card-link" href="https://fibrasilcorp.sharepoint.com/:x:/r/sites/OPERAESFIBRASIL/_layouts/15/Doc.aspx?sourcedoc=%7B1D28C223-3A1F-4855-87D4-B1663003274E%7D&file=Sobreaviso%20Rede%20Externa_Ver.5-%202026_01042026.xlsx&action=default&mobileredirect=true" target="_blank" rel="noopener noreferrer" aria-label="Abrir SOBREAVISO PE">
+                <a class="card-link" href="https://padtec.sharepoint.com/:x:/r/sites/OperacoesFiBrasil/_layouts/15/Doc.aspx?sourcedoc=%7B" target="_blank" rel="noopener noreferrer" aria-label="Abrir SOBREAVISO PE">
                     <div class="card card-orange">
                         <h2>SOBREAVISO PLANTA EXTERNA</h2>
                         <p>Sobreaviso Rede Externa_Ver.5- 2025_02062025.xlsx</p>
@@ -159,7 +159,7 @@
             <h1 style="color: #00b7ff; text-align: center; margin-bottom: 50px; font-size: 4em; font-weight: bold;">FIBRASIL</h1>
 
             <div class="card-container">
-                <a class="card-link" href="https://fibrasilcorp.sharepoint.com/:x:/r/sites/OPERAESFIBRASIL/_layouts/15/Doc.aspx?sourcedoc=%7B1D28C223-3A1F-4855-87D4-B1663003274E%7D&file=Sobreaviso%20Rede%20Externa_Ver.5-%202026_01042026.xlsx&action=default&mobileredirect=true" target="_blank" rel="noopener noreferrer" aria-label="Abrir SOBREAVISO PE">
+                <a class="card-link" href="https://fibrasilcorp.sharepoint.com/:x:/r/sites/OPERAESFIBRASIL/_layouts/15/doc2.aspx?sourcedoc=%7BC250FBDD-3153-4EB8-90C2-1328C504D5B3%7D&file=Sobreaviso%20Rede%20Externa_Ver.5-%202025_02062025.xlsx&action=default&mobileredirect=true" target="_blank" rel="noopener noreferrer" aria-label="Abrir SOBREAVISO PE">
                     <div class="card">
                         <h2>SOBREAVISO PLANTA EXTERNA</h2>
                         <p>Sobreaviso Rede Externa_Ver.5- 2025_02062025.xlsx</p>
@@ -276,7 +276,7 @@
             if (limpar) {
                 window.open("https://fibrasilferramentas.padtec.com.br/cope/", "_blank");
             } else {
-                window.open("https://fibrasilferramentas.padtec.com.br/parciais-cope/", "_blank");
+                window.open("https://fibrasilferramentas.padtec.com.br/cope_analise/", "_blank");
             }
         }
         
@@ -290,6 +290,7 @@
                 modalAgente.style.display = "none";
             }
         });
+
 
         // --- Agente Rápido Logic ---
 const baseDadosFibra = [
@@ -484,7 +485,7 @@ const baseDadosFibra = [
 
             filtered.forEach(item => {
                 const div = document.createElement('div');
-                div.COPE_Style.cssText = 'border-bottom: 1px solid var(--border-color); padding: 15px; margin-bottom: 5px; background: rgba(255,255,255,0.05); border-radius: 8px; transition: background 0.2s;';
+                div.style.cssText = 'border-bottom: 1px solid var(--border-color); padding: 15px; margin-bottom: 5px; background: rgba(255,255,255,0.05); border-radius: 8px; transition: background 0.2s;';
                 div.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                         <strong style="color: var(--accent-color); font-size: 1.1em;">${item.municipio} <span style="font-size: 0.8em; color: var(--text-color); opacity: 0.8;">(${item.uf})</span></strong>
@@ -500,7 +501,7 @@ const baseDadosFibra = [
         });
     </script>
 
-    <script src="COPE.js"></script>
+    <script src="Cope.js"></script>
     <script src="../interactive-effects.js"></script>
 </body>
 </html>
