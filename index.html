@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="Padtec.png" />
     <title>COPE | PADTEC</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="COPE_Style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/all.min.css">
 </head>
 <body>
@@ -484,7 +484,7 @@ const baseDadosFibra = [
 
             filtered.forEach(item => {
                 const div = document.createElement('div');
-                div.style.cssText = 'border-bottom: 1px solid var(--border-color); padding: 15px; margin-bottom: 5px; background: rgba(255,255,255,0.05); border-radius: 8px; transition: background 0.2s;';
+                div.COPE_Style.cssText = 'border-bottom: 1px solid var(--border-color); padding: 15px; margin-bottom: 5px; background: rgba(255,255,255,0.05); border-radius: 8px; transition: background 0.2s;';
                 div.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                         <strong style="color: var(--accent-color); font-size: 1.1em;">${item.municipio} <span style="font-size: 0.8em; color: var(--text-color); opacity: 0.8;">(${item.uf})</span></strong>
@@ -500,7 +500,7 @@ const baseDadosFibra = [
         });
     </script>
 
-    <script src="js/main.js"></script>
+    <script src="COPE.js"></script>
     <script src="../interactive-effects.js"></script>
 </body>
 </html>
