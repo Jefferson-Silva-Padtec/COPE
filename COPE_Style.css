@@ -74,22 +74,22 @@ body {
 .sidebar {
     width: var(--sidebar-width);
     background-color: rgba(22, 27, 34, 0.20);
-    padding: 15px 10px;
+    padding: 0; /* Padding será controlado pelos filhos */
     box-shadow: 4px 0 10px rgba(0, 0, 0, 0.3);
     transition: width 0.3s ease, background-color 0.3s ease;
     flex-shrink: 0;
     border-right: 1px solid var(--border-color);
-    height: 100vh;
-    min-height: 100%;
+    height: 100%;
     box-sizing: border-box;
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow-x: hidden; /* Overflow Y é movido para o nav */
     position: fixed; /* Fixa a sidebar */
     top: 0;
     bottom: 0;
     left: 0;
     z-index: 50;
     backdrop-filter: blur(5px);
+    display: flex;
+    flex-direction: column;
 }
 
 /* Logo colocado inline ao lado do botão */
@@ -113,7 +113,7 @@ html[data-theme="light"] .sidebar-nav a span {
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    padding-right: 10px;
+    padding: 15px 20px 0 20px; /* Adicionado padding */
     margin-bottom: 15px;
     position: relative;
 }
@@ -218,6 +218,18 @@ html[data-theme="light"] .sidebar-nav a span {
     display: none;
 }
 
+.sidebar-nav {
+    flex-grow: 1; /* Ocupa o espaço disponível */
+    overflow-y: auto; /* Permite scroll apenas na navegação */
+    padding: 0 10px; /* Padding lateral para os itens */
+    scrollbar-width: none; /* Oculta a barra no Firefox */
+    -ms-overflow-style: none; /* Oculta a barra no IE e Edge */
+}
+
+.sidebar-nav::-webkit-scrollbar {
+    display: none; /* Oculta a barra no Chrome, Safari e Opera */
+}
+
 .sidebar-nav ul {
     list-style: none;
     padding: 20px 0 0 0;
@@ -231,7 +243,7 @@ html[data-theme="light"] .sidebar-nav a span {
 .sidebar-nav a {
     display: flex;
     align-items: center;
-    padding: 10px 15px;
+    padding: 10px;
     border-radius: 6px;
     color: #cccccc;
     text-decoration: none;
@@ -247,7 +259,7 @@ html[data-theme="light"] .sidebar-nav a span {
 
 .sidebar.collapsed .sidebar-nav a {
     justify-content: center;
-    padding: 10px 0; /* Ajusta padding para centralizar */
+    padding: 10px;
 }
 
 .sidebar.collapsed .sidebar-nav a i {
@@ -274,7 +286,7 @@ html[data-theme="light"] .sidebar-nav a span {
     font-size: 0.85em;
     font-weight: bold;
     color: var(--accent-color);
-    margin: 0 0 10px 15px;
+    margin: 0 0 10px 10px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding: 5px 0;
@@ -314,7 +326,7 @@ html[data-theme="light"] .sidebar-nav a span {
 .sidebar-nav a.nav-orange {
     border: 2px solid #FF8C00;
     border-radius: 8px;
-    padding: 12px 15px;
+    padding: 12px 10px;
     background-color: rgba(255, 140, 0, 0.08);
     margin: 5px 0;
     transition: all 0.3s ease;
@@ -819,6 +831,176 @@ html[data-theme="dark"] body {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
+/* --- Footer da Sidebar com botão de teste --- */
+.sidebar-footer {
+    padding: 0; /* Removido padding para encostar na borda */
+    border-top: 1px solid var(--border-color);
+    flex-shrink: 0; /* Impede que o footer encolha */
+    background-color: transparent;
+}
+
+.network-test-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: rgba(0, 191, 255, 0.05);
+    border: none; /* Remove bordas para encaixe perfeito */
+    color: var(--accent-color);
+    padding: 15px 20px; /* Ajuste para manter altura agradável */
+    border-radius: 0; /* Retira o arredondamento para colar nos cantos */
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.network-test-btn i {
+    margin-right: 10px;
+    font-size: 1.1em;
+}
+
+.network-test-btn:hover {
+    background-color: var(--accent-color);
+    color: var(--background-color);
+    box-shadow: 0 -2px 10px rgba(0, 191, 255, 0.3); /* Sombra ajustada para cima */
+}
+
+.sidebar.collapsed .sidebar-footer {
+    padding: 0;
+}
+
+.sidebar.collapsed .network-test-btn {
+    justify-content: center;
+}
+
+.sidebar.collapsed .network-test-btn span {
+    display: none;
+}
+
+.sidebar.collapsed .network-test-btn i {
+    margin-right: 0;
+}
+
+/* --- Modal de Teste de Rede --- */
+.network-test-modal {
+    display: none; /* Alterado para flex para centralizar */
+    position: fixed;
+    z-index: 10001; /* Acima do agente rápido */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.85);
+    backdrop-filter: blur(5px);
+    justify-content: center;
+    align-items: center;
+}
+
+.network-test-content {
+    background-color: var(--card-background);
+    padding: 30px 40px;
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 0 30px rgba(0, 191, 255, 0.3);
+}
+
+.network-test-content .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: color 0.3s;
+}
+
+.network-test-content .close-btn:hover {
+    color: var(--accent-color);
+}
+
+.network-test-content h2 {
+    color: var(--accent-color);
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+
+.server-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9em;
+    color: var(--text-color);
+    opacity: 0.8;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.test-group {
+    margin-bottom: 20px;
+}
+
+.test-group h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.2em;
+    color: var(--text-color);
+    text-align: left;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 20px;
+    background-color: var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-color-hover), var(--accent-color));
+    border-radius: 10px;
+    transition: width 0.2s linear;
+}
+
+.speed-value {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: var(--accent-color);
+    margin: 0;
+}
+
+.test-status {
+    margin-top: 20px;
+    font-style: italic;
+    color: var(--text-color);
+    opacity: 0.9;
+}
+
+#restart-network-test-btn {
+    margin-top: 20px;
+    background-color: var(--accent-color);
+    color: var(--background-color);
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+    display: none; /* Começa escondido */
+}
+
+#restart-network-test-btn:hover {
+    transform: scale(1.05);
+}
+
 /* === ESTILOS ESPECÍFICOS PARA PÁGINA LINKS COPE === */
 body.page-links-cope .particle {
     background: rgba(255, 140, 0, 0.8) !important;
@@ -828,6 +1010,138 @@ body.page-links-cope .particle {
 /* Canvas do glow do cursor em laranja */
 body.page-links-cope #cursor-glow-canvas {
     filter: hue-rotate(45deg) saturate(1.2) !important;
+}
+
+/* Título principal do Agente Rápido */
+.agente-main-title {
+    text-align: center;
+    color: var(--accent-color);
+    margin-bottom: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 1.5em;
+    letter-spacing: 1px;
+}
+
+/* Estilos para o Agente Rápido com botões e colapso */
+.agente-operadora-btn {
+    background-color: var(--card-background);
+    color: var(--text-color);
+    border: 2px solid var(--border-color);
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2em;
+    flex-grow: 1; /* Faz os botões ocuparem o espaço */
+}
+
+.agente-operadora-btn:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.agente-operadora-btn.active {
+    background-color: var(--accent-color);
+    color: #000;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(0, 191, 255, 0.4);
+}
+.agente-botoes-container {
+    gap: 15px !important;
+}
+
+
+.collapsible-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Estilos para os cards de resultado do Agente Rápido */
+.agente-result-card {
+    background-color: rgba(var(--accent-rgb, 0, 191, 255), 0.1);
+    border: 1px solid rgba(var(--accent-rgb, 0, 191, 255), 0.3);
+    backdrop-filter: blur(4px);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+    animation: result-fade-in 0.4s ease-out;
+}
+
+@keyframes result-fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.agente-result-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    border-color: rgba(var(--accent-rgb, 0, 191, 255), 0.6);
+}
+
+.agente-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 1.1em;
+}
+
+.agente-card-header strong {
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+.agente-card-header strong span {
+    font-size: 0.8em;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.agente-card-header > span {
+    background-color: var(--accent-color);
+    color: var(--background-color);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 0.8em;
+}
+
+.agente-card-body, .agente-card-contacts {
+    font-size: 0.9em;
+    opacity: 0.9;
+    border-left: 3px solid var(--border-color);
+    padding-left: 12px;
+    margin-top: 10px;
+}
+
+.agente-card-body div, .agente-card-contacts div {
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.agente-card-body i, .agente-card-contacts i {
+    width: 20px;
+    text-align: center;
+    margin-right: 8px;
+    opacity: 0.7;
+}
+
+.copy-phone {
+    cursor: pointer;
+    color: var(--accent-color);
+    margin-left: 10px;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.copy-phone:hover {
+    transform: scale(1.2);
 }
 
 /* === ESTILOS UNIFICADOS (SPA) === */
