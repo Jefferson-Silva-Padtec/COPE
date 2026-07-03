@@ -52,6 +52,12 @@
                 </ul>
             </div>
         </nav>
+        <!-- Botão de Teste de Rede -->
+        <div class="sidebar-footer">
+            <button id="start-network-test-btn" class="network-test-btn">
+                <i class="fas fa-wifi"></i> <span>Iniciar teste rede</span>
+            </button>
+        </div>
     </aside>
 
     <main class="content">
@@ -80,7 +86,7 @@
                     <p>Relatórios e dashboards de volumetria.</p>
                 </a>
 
-                <a href="https://fibrasilferramentas.padtec.com.br/cope/" class="card card-link card-orange">
+                <a href="https://fibrasilferramentas.padtec.com.br/cope_analise/" class="card card-link card-orange">
                     <h2>Analise e Limpeza de Dados</h2>
                     <p style="font-size:0.95em; margin:0;">Verifica SP/CTO e remove Notificação TA VIVO</p>
                 </a>
@@ -253,15 +259,53 @@
     <!-- Modal Agente Rápido -->
     <div id="agente-rapido-modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(4px);">
         <div style="background-color: var(--card-background); margin: 10% auto; padding: 30px; border: 2px solid var(--accent-color); width: 90%; max-width: 600px; border-radius: 15px; box-shadow: 0 0 20px rgba(0,0,0,0.5); position: relative; color: var(--text-color);">
-            <span onclick="closeAgenteRapidoModal()" style="position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; color: var(--accent-color); transition: color 0.3s;">&times;</span>
-            <h2 style="text-align: center; color: var(--accent-color); margin-bottom: 25px; font-weight: bold; text-transform: uppercase;">Busca de Cidades/Siglas</h2>
-            
-            <div style="position: relative; margin-bottom: 20px;">
-                <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-color); opacity: 0.7;"></i>
-                <input type="text" id="agente-search-input" placeholder="Digite o município ou sigla..." style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--background-color); color: var(--text-color); font-size: 1.1em; outline: none; box-sizing: border-box;">
+            <span id="close-agente-rapido-modal" style="position: absolute; top: 15px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; color: var(--accent-color); transition: color 0.3s;">&times;</span>
+            <h2 class="agente-main-title">Escalonamento Planta Externa</h2>
+            <div id="agente-botoes-container" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 25px;">
+                <button id="btn-agente-fibrasil" class="agente-operadora-btn">FIBRASIL</button>
+                <button id="btn-agente-vivo" class="agente-operadora-btn">VIVO</button>
             </div>
 
-            <div id="agente-search-results" style="max-height: 300px; overflow-y: auto; padding-right: 5px;"></div>
+            <div id="agente-search-container" class="collapsible-content">
+                <h2 id="agente-search-title" style="text-align: center; color: var(--accent-color); margin-bottom: 25px; font-weight: bold; text-transform: uppercase;"></h2>
+                
+                <div style="position: relative; margin-bottom: 20px;">
+                    <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-color); opacity: 0.7;"></i>
+                    <input type="text" id="agente-search-input" placeholder="Digite o município ou sigla..." style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--background-color); color: var(--text-color); font-size: 1.1em; outline: none; box-sizing: border-box;">
+                </div>
+                
+                <div id="agente-search-results" style="max-height: 300px; overflow-y: auto; padding-right: 5px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Teste de Rede -->
+    <div id="network-test-modal" class="network-test-modal">
+        <div class="network-test-content">
+            <span id="close-network-test-modal" class="close-btn">&times;</span>
+            <h2>Análise de Conexão</h2>
+            <div id="network-test-results">
+                <div class="server-info">
+                    <p><strong>Servidor:</strong> <span id="test-server-name">-</span></p>
+                    <p><strong>Ping:</strong> <span id="test-ping">-</span> ms</p>
+                </div>
+                <div class="test-group">
+                    <h3>Download</h3>
+                    <div class="progress-bar-container">
+                        <div id="download-progress" class="progress-bar"></div>
+                    </div>
+                    <p class="speed-value"><span id="download-speed">-</span> Mbps</p>
+                </div>
+                <div class="test-group">
+                    <h3>Upload</h3>
+                    <div class="progress-bar-container">
+                        <div id="upload-progress" class="progress-bar"></div>
+                    </div>
+                    <p class="speed-value"><span id="upload-speed">-</span> Mbps</p>
+                </div>
+                <div id="network-test-status" class="test-status">Aguardando início...</div>
+            </div>
+            <button id="restart-network-test-btn">Testar Novamente</button>
         </div>
     </div>
 
@@ -274,9 +318,9 @@
         function handleEnvioEscolha(limpar) {
             document.getElementById('envio-modal').style.display = 'none';
             if (limpar) {
-                window.open("https://fibrasilferramentas.padtec.com.br/cope/", "_blank");
-            } else {
                 window.open("https://fibrasilferramentas.padtec.com.br/cope_analise/", "_blank");
+            } else {
+                window.open("https://fibrasilferramentas.padtec.com.br/parciais-cope/", "_blank");
             }
         }
         
@@ -291,261 +335,9 @@
             }
         });
 
-
-        // --- Agente Rápido Logic ---
-const baseDadosFibra = [
-    { municipio: "Arapiraca", uf: "AL", sigla: "AIR", fila: "PLANTA EXTERNA N1 / AL", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Manaus", uf: "AM", sigla: "MNS", fila: "PLANTA EXTERNA N1 / AM", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Júlio Nascimento (92) 99310-9714" },
-    { municipio: "Macapa", uf: "AP", sigla: "MPA", fila: "PLANTA EXTERNA N1 / AP", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Paulo Teixeira (42) 99162-4090" },
-    { municipio: "Arraial D'Ajuda", uf: "BA", sigla: "ALDA", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Barreiras", uf: "BA", sigla: "BES", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Eunapolis", uf: "BA", sigla: "EUS", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Guanambi", uf: "BA", sigla: "GNB", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Ilheus", uf: "BA", sigla: "ILH", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Itabuna", uf: "BA", sigla: "ITB", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Jequie", uf: "BA", sigla: "JEE", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Lagarto", uf: "SE", sigla: "LAT", fila: "PLANTA EXTERNA N1 / SE", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Luis Eduardo Magalhaes", uf: "BA", sigla: "MIOO", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Porto Seguro", uf: "BA", sigla: "PGU", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Santo Antonio de Jesus", uf: "BA", sigla: "SNJ", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Teixeira de Freitas", uf: "BA", sigla: "TAF", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Trancoso", uf: "BA", sigla: "TCOS", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Vitoria da Conquista", uf: "BA", sigla: "VCA", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Crato", uf: "CE", sigla: "CTO", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Douglas Mata (86) 98106-6049" },
-    { municipio: "Juazeiro do Norte", uf: "CE", sigla: "JNE", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Douglas Mata (86) 98106-6049" },
-    { municipio: "Sobral", uf: "CE", sigla: "SOL", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Douglas Mata (86) 98106-6049" },
-    { municipio: "Cachoeiro de Itapemirim", uf: "ES", sigla: "CIM", fila: "PLANTA EXTERNA N1 / ES", eps: "FIBRASIL", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Fabiano Martelete (11) 97492-1488" },
-    { municipio: "Guarapari", uf: "ES", sigla: "GRI", fila: "PLANTA EXTERNA N1 / ES", eps: "FIBRASIL", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Fabiano Martelete (11) 97492-1488" },
-    { municipio: "Santa Maria de Jetiba", uf: "ES", sigla: "SMJ", fila: "PLANTA EXTERNA N1 / ES", eps: "FIBRASIL", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Fabiano Martelete (11) 97492-1488" },
-    { municipio: "Viana", uf: "ES", sigla: "VIA", fila: "PLANTA EXTERNA N1 / ES", eps: "FIBRASIL", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Fabiano Martelete (11) 97492-1488" },
-    { municipio: "Aracruz", uf: "ES", sigla: "ACZ", fila: "PLANTA EXTERNA N1 / ES", eps: "FIBRASIL", status: "SAGRE", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Fabiano Martelete (11) 97492-1488" },
-    { municipio: "Sao Mateus", uf: "ES", sigla: "SMT", fila: "PLANTA EXTERNA N1 / ES", eps: "FIBRASIL", status: "SAGRE", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Fabiano Martelete (11) 97492-1488" },
-    { municipio: "Jaragua", uf: "GO", sigla: "JRG", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Jatai", uf: "GO", sigla: "JTI", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Mineiros", uf: "GO", sigla: "MNI", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Caldas Novas", uf: "GO", sigla: "CLV", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "SAGRE", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Catalao", uf: "GO", sigla: "CTL", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "SAGRE", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Itumbiara", uf: "GO", sigla: "IUB", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "SAGRE", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Morrinhos", uf: "GO", sigla: "MIH", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "SAGRE", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Formosa", uf: "GO", sigla: "FRM", fila: "PLANTA EXTERNA N1 / GO 3", eps: "ABILITY", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Itaberai", uf: "GO", sigla: "IEI", fila: "PLANTA EXTERNA N1 / GO 3", eps: "ABILITY", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Inhumas", uf: "GO", sigla: "IUS", fila: "PLANTA EXTERNA N1 / GO 3", eps: "ABILITY", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Acailandia", uf: "MA", sigla: "ACD", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Tiago Araújo (11) 93448-3914" },
-    { municipio: "Balsas", uf: "MA", sigla: "BLA", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Tiago Araújo (11) 93448-3914" },
-    { municipio: "Imperatriz", uf: "MA", sigla: "ITZ", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Tiago Araújo (11) 93448-3914" },
-    { municipio: "Paco do Lumiar", uf: "MA", sigla: "PCL", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Tiago Araújo (11) 93448-3914" },
-    { municipio: "Santa Ines", uf: "MA", sigla: "SIS", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Tiago Araújo (11) 93448-3914" },
-    { municipio: "Sao Jose de Ribamar", uf: "SJE", sigla: "SJE", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Tiago Araújo (11) 93448-3914" },
-    { municipio: "Sao Luis", uf: "MA", sigla: "SLS", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Tiago Araújo (11) 93448-3914" },
-    { municipio: "Uberlandia", uf: "MG", sigla: "ULA", fila: "PLANTA EXTERNA N1 / MG 1", eps: "ONDACOM", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Eufran Freitas (31) 97595-2474" },
-    { municipio: "Uberaba", uf: "MG", sigla: "URA", fila: "PLANTA EXTERNA N1 / MG 1", eps: "ONDACOM", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Eufran Freitas (31) 97595-2474" },
-    { municipio: "Ibirite", uf: "MG", sigla: "IIE", fila: "PLANTA EXTERNA N1 / MG 2", eps: "ONDACOM", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Eufran Freitas (31) 97595-2474" },
-    { municipio: "Divinopolis", uf: "MG", sigla: "DVL", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Alessandro Moreira (11) 94212-4957" },
-    { municipio: "Ribeirao das Neves", uf: "MG", sigla: "RNS", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Eufran Freitas (31) 97595-2474" },
-    { municipio: "Sete Lagoas", uf: "MG", sigla: "SLA", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Eufran Freitas (31) 97595-2474" },
-    { municipio: "Santa Luzia", uf: "MG", sigla: "SLU", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Eufran Freitas (31) 97595-2474" },
-    { municipio: "Tres Coracoes", uf: "MG", sigla: "TCS", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Alessandro Moreira (11) 94212-4957" },
-    { municipio: "Timoteo", uf: "MG", sigla: "TTO", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Eufran Freitas (31) 97595-2474" },
-    { municipio: "Tres Pontas", uf: "MG", sigla: "TPS", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SAGRE", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Alessandro Moreira (11) 94212-4957" },
-    { municipio: "Varginha", uf: "MG", sigla: "VGA", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SAGRE", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Alessandro Moreira (11) 94212-4957" },
-    { municipio: "Pocos de Caldas", uf: "MG", sigla: "PCS", fila: "PLANTA EXTERNA N1 / MG 4", eps: "RADIANTE", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Alessandro Moreira (11) 94212-4957" },
-    { municipio: "Pouso Alegre", uf: "MG", sigla: "PSA", fila: "PLANTA EXTERNA N1 / MG 4", eps: "RADIANTE", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Alessandro Moreira (11) 94212-4957" },
-    { municipio: "Nova Lima", uf: "MG", sigla: "NLA", fila: "PLANTA EXTERNA N1 / MG 5", eps: "RADIANTE", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Eufran Freitas (31) 97595-2474" },
-    { municipio: "Tres Lagoas", uf: "MS", sigla: "TLS", fila: "PLANTA EXTERNA N1 / MS", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Adonielson Jordão (11) 91670-7054" },
-    { municipio: "Campo Verde", uf: "MT", sigla: "CZV", fila: "PLANTA EXTERNA N1 / MT 2", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Adonielson Jordão (11) 91670-7054" },
-    { municipio: "Primavera do Leste", uf: "MT", sigla: "PVT", fila: "PLANTA EXTERNA N1 / MT 2", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Adonielson Jordão (11) 91670-7054" },
-    { municipio: "Tangara da Serra", uf: "MT", sigla: "TGS", fila: "PLANTA EXTERNA N1 / MT 2", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Adonielson Jordão (11) 91670-7054" },
-    { municipio: "Lucas do Rio Verde", uf: "MT", sigla: "LRV", fila: "PLANTA EXTERNA N1 / MT 1", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Adonielson Jordão (11) 91670-7054" },
-    { municipio: "Nova Mutum", uf: "MT", sigla: "NMM", fila: "PLANTA EXTERNA N1 / MT 1", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Adonielson Jordão (11) 91670-7054" },
-    { municipio: "Sorriso", uf: "MT", sigla: "SSZ", fila: "PLANTA EXTERNA N1 / MT 1", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Adonielson Jordão (11) 91670-7054" },
-    { municipio: "Sinop", uf: "MT", sigla: "SNO", fila: "PLANTA EXTERNA N1 / MT 2", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Adonielson Jordão (11) 91670-7054" },
-    { municipio: "Altamira", uf: "PA", sigla: "ATM", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Bruno Ayres (91) 98027-1952" },
-    { municipio: "Belem", uf: "PA", sigla: "BLM", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Bruno Ayres (91) 98027-1952" },
-    { municipio: "Castanhal", uf: "PA", sigla: "CAH", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Bruno Ayres (91) 98027-1952" },
-    { municipio: "Canaa dos Carajas", uf: "PA", sigla: "CKJ", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Bruno Ayres (91) 98027-1952" },
-    { municipio: "Capanema", uf: "PA", sigla: "CPN", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Bruno Ayres (91) 98027-1952" },
-    { municipio: "Paragominas", uf: "PA", sigla: "PGN", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Bruno Ayres (91) 98027-1952" },
-    { municipio: "Parauapebas", uf: "PA", sigla: "PUP", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Bruno Ayres (91) 98027-1952" },
-    { municipio: "Redencao", uf: "PA", sigla: "RDO", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Bruno Ayres (91) 98027-1952" },
-    { municipio: "Tucurui", uf: "PA", sigla: "TUU", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Bruno Ayres (91) 98027-1952" },
-    { municipio: "Cabedelo", uf: "PB", sigla: "CBD", fila: "PLANTA EXTERNA N1 / PB", eps: "TECNOMULTI", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Samuel Costa (11) 94323-7772" },
-    { municipio: "Patos", uf: "PB", sigla: "POS", fila: "PLANTA EXTERNA N1 / PB", eps: "TECNOMULTI", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Samuel Costa (11) 94323-7772" },
-    { municipio: "Petrolina", uf: "PE", sigla: "PTA", fila: "PLANTA EXTERNA N1 / PE 1", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Garanhuns", uf: "PE", sigla: "GUS", fila: "PLANTA EXTERNA N1 / PE 2", eps: "TECNOMULTI", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Samuel Costa (11) 94323-7772" },
-    { municipio: "Parnaiba", uf: "PI", sigla: "PNA", fila: "PLANTA EXTERNA N1 / PI", eps: "R2", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Douglas Mata (86) 98106-6049" },
-    { municipio: "Picos", uf: "PI", sigla: "PCZ", fila: "PLANTA EXTERNA N1 / PI 2", eps: "VIRTEX", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Douglas Mata (86) 98106-6049" },
-    { municipio: "Teresina", uf: "PI", sigla: "TSA", fila: "PLANTA EXTERNA N1 / PI 2", eps: "VIRTEX", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Douglas Mata (86) 98106-6049" },
-    { municipio: "Araruama", uf: "RJ", sigla: "AMA", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-    { municipio: "Armacao dos Buzios", uf: "RJ", sigla: "ARBU", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-    { municipio: "Cabo Frio", uf: "RJ", sigla: "CBF", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-    { municipio: "Iguaba Grande", uf: "RJ", sigla: "IGGR", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-    { municipio: "Itaperuna", uf: "RJ", sigla: "IRA", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-    { municipio: "Petropolis", uf: "RJ", sigla: "PTS", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-    { municipio: "Rio Bonito", uf: "RJ", sigla: "RBT", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-    { municipio: "Rio das Ostras", uf: "RJ", sigla: "RIOS", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-    { municipio: "Angra dos Reis", uf: "RJ", sigla: "ARS", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Jesus Pedruzi (21) 97260-9581" },
-    { municipio: "Barra Mansa", uf: "RJ", sigla: "BMA", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Jesus Pedruzi (21) 97260-9581" },
-    { municipio: "Barra do Pirai", uf: "RJ", sigla: "BPI", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Jesus Pedruzi (21) 97260-9581" },
-    { municipio: "Mangaratiba", uf: "RJ", sigla: "MGB", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Jesus Pedruzi (21) 97260-9581" },
-    { municipio: "Nova Friburgo", uf: "RJ", sigla: "NOF", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-    { municipio: "Paraty", uf: "RJ", sigla: "PAT", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Jesus Pedruzi (21) 97260-9581" },
-    { municipio: "Resende", uf: "RJ", sigla: "RSD", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Jesus Pedruzi (21) 97260-9581" },
-    { municipio: "Volta Redonda", uf: "RJ", sigla: "VRD", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Jesus Pedruzi (21) 97260-9581" },
-    { municipio: "Mossoro", uf: "RN", sigla: "MRO", fila: "PLANTA EXTERNA N1 / RN", eps: "TECNOMULTI", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Samuel Costa (11) 94323-7772" },
-    { municipio: "Parnamirim", uf: "RN", sigla: "PWM", fila: "PLANTA EXTERNA N1 / RN", eps: "TECNOMULTI", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Samuel Costa (11) 94323-7772" },
-    { municipio: "Ji-Parana", uf: "RO", sigla: "JIP", fila: "PLANTA EXTERNA N1 / RO", eps: "ABILITY", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-    { municipio: "Carlos Barbosa", uf: "RS", sigla: "CLB", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Dois Irmaos", uf: "RS", sigla: "DSR", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Erechim", uf: "RS", sigla: "ERE", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Flores da Cunha", uf: "RS", sigla: "FCA", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Garibaldi", uf: "RS", sigla: "GRD", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Ivoti", uf: "RS", sigla: "IVI", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Capao da Canoa", uf: "RS", sigla: "KDK", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Nova Petropolis", uf: "RS", sigla: "NVP", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Osorio", uf: "RS", sigla: "OSR", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Sao Marcos", uf: "RS", sigla: "SCS", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Torres", uf: "RS", sigla: "TES", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Taquara", uf: "RS", sigla: "TQR", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Tramandai", uf: "RS", sigla: "TRI", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Veranopolis", uf: "RS", sigla: "VNS", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Xangri-la", uf: "RS", sigla: "XNLA", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Santa Rosa", uf: "RS", sigla: "SRO", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SAGRE", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Santo Angelo", uf: "RS", sigla: "SAN", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SAGRE", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Tres de Maio", uf: "RS", sigla: "TMI", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SAGRE", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Alegrete", uf: "RS", sigla: "ALG", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Bage", uf: "RS", sigla: "BGE", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Camaqua", uf: "RS", sigla: "CAM", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Cachoeira do Sul", uf: "RS", sigla: "CCR", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Canela", uf: "RS", sigla: "CEN", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Carazinho", uf: "RS", sigla: "CIO", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Charqueadas", uf: "RS", sigla: "CQU", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Estrela", uf: "RS", sigla: "ETA", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Gramado", uf: "RS", sigla: "GDO", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Igrejinha", uf: "RS", sigla: "IJH", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Ijui", uf: "RS", sigla: "IJI", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Lajeado", uf: "RS", sigla: "LJO", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Marcelo de Bairros (11) 94493-9769" },
-    { municipio: "Lagoa Vermelha", uf: "RS", sigla: "LVH", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Palmeira das Missoes", uf: "RS", sigla: "PMM", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Sant'Ana do Livramento", uf: "RS", sigla: "SIV", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Sarandi", uf: "RS", sigla: "SRD", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Teutonia", uf: "RS", sigla: "TUN", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Uruguaiana", uf: "RS", sigla: "UGN", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Vacaria", uf: "RS", sigla: "VAA", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-    { municipio: "Venancio Aires", uf: "RS", sigla: "VAI", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Marcelo de Bairros (11) 94493-9769" },
-    { municipio: "Concordia", uf: "SC", sigla: "CDA", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-    { municipio: "Capinzal", uf: "SC", sigla: "CNZ", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-    { municipio: "Fraiburgo", uf: "SC", sigla: "FGO", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-    { municipio: "Garopaba", uf: "SC", sigla: "GRB", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-    { municipio: "Imbituba", uf: "SC", sigla: "IMA", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-    { municipio: "Mafra", uf: "SC", sigla: "MFA", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-    { municipio: "Navegantes", uf: "SC", sigla: "NVG", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-    { municipio: "Pomerode", uf: "SC", sigla: "POD", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-    { municipio: "Rio do Sul", uf: "SC", sigla: "RSL", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-    { municipio: "Sao Bento do Sul", uf: "SC", sigla: "SBS", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-    { municipio: "Araguaina", uf: "TO", sigla: "ARN", fila: "PLANTA EXTERNA N1 / TO", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Irismar Cardoso (11) 94205-6117" },
-    { municipio: "Palmas", uf: "TO", sigla: "PMJ", fila: "PLANTA EXTERNA N1 / TO", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Irismar Cardoso (11) 94205-6117" },
-    { municipio: "Sao Pedro da Aldeia", uf: "RJ", sigla: "SPA", fila: "PLANTA EXTERNA N1/RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-    { municipio: "Teresopolis", uf: "RJ", sigla: "TRL", fila: "PLANTA EXTERNA N1/RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-    { municipio: "Tres Rios", uf: "RJ", sigla: "TRS", fila: "PLANTA EXTERNA N1/RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-    { municipio: "Valenca", uf: "RJ", sigla: "VLC", fila: "PLANTA EXTERNA N1/RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Jesus Pedruzi (21) 97260-9581" }
-];
-            function openAgenteRapidoModal(event) {
-            if(event) event.preventDefault();
-            document.getElementById('agente-rapido-modal').style.display = 'block';
-            document.getElementById('agente-search-input').value = '';
-            document.getElementById('agente-search-results').innerHTML = '';
-            setTimeout(() => document.getElementById('agente-search-input').focus(), 100);
-        }
-
-        function closeAgenteRapidoModal() {
-            document.getElementById('agente-rapido-modal').style.display = 'none';
-        }
-
-        document.getElementById('agente-search-input').addEventListener('input', function(e) {
-            const term = e.target.value.toLowerCase();
-            const resultsContainer = document.getElementById('agente-search-results');
-            resultsContainer.innerHTML = '';
-
-            if (term.length < 2) return;
-
-            const filtered = baseDadosFibra.filter(item => 
-                item.municipio.toLowerCase().includes(term) || 
-                item.sigla.toLowerCase().includes(term)
-            );
-
-            if (filtered.length === 0) {
-                resultsContainer.innerHTML = '<p style="text-align: center; opacity: 0.7; margin-top: 20px;">Nenhum resultado encontrado.</p>';
-                return;
-            }
-
-            const formatContact = (text) => {
-                if (!text) return '';
-                return text.replace(/\s*(?=(?:015)?\(\d{2}\))/, ' - ');
-            };
-
-            // Função para extrair telefone do texto (sem parênteses)
-            const extractPhone = (text) => {
-                if (!text) return '';
-                const match = text.match(/\(?\d{2}\)?\s?\d{4,5}[-\s]?\d{4}/);
-                if (!match) return '';
-                // Remove parênteses e espaços
-                return match[0].replace(/\(|\)|\s/g, '');
-            };
-
-            // Função para copiar telefone ao clicar
-            const copyPhone = async (phone, element) => {
-                try {
-                    await navigator.clipboard.writeText(phone);
-                    const originalText = element.innerHTML;
-                    element.innerHTML = '<i class="fas fa-check"></i> Copiado!';
-                    element.style.color = '#4CAF50';
-                    setTimeout(() => {
-                        element.innerHTML = originalText;
-                        element.style.color = '';
-                    }, 1500);
-                } catch (err) {
-                    console.error('Erro ao copiar:', err);
-                }
-            };
-
-            filtered.forEach(item => {
-                const div = document.createElement('div');
-                div.style.cssText = 'border-bottom: 1px solid var(--border-color); padding: 15px; margin-bottom: 5px; background: rgba(255,255,255,0.05); border-radius: 8px; transition: background 0.2s;';
-                
-                const supPhone = extractPhone(item.supervisor);
-                const coordPhone = extractPhone(item.coordenador);
-                
-                div.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                        <strong style="color: var(--accent-color); font-size: 1.1em;">${item.municipio} <span style="font-size: 0.8em; color: var(--text-color); opacity: 0.8;">(${item.uf})</span></strong>
-                        <span style="background-color: var(--accent-color); color: var(--background-color); padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.9em;">${item.sigla}</span>
-                    </div>
-                    <div style="font-size: 0.9em; opacity: 0.9; margin-bottom: 2px;"><i class="fas fa-layer-group" style="width: 20px; text-align: center; margin-right: 5px;"></i> ${item.fila}</div>
-                    <div style="font-size: 0.85em; opacity: 0.7; margin-bottom: 2px;"><i class="fas fa-hard-hat" style="width: 20px; text-align: center; margin-right: 5px;"></i> EPS: ${item.eps}</div>
-                    <div style="font-size: 0.85em; opacity: 0.7; margin-bottom: 2px;">
-                        <i class="fas fa-user-check" style="width: 20px; text-align: center; margin-right: 5px;"></i> Sup: ${formatContact(item.supervisor)}
-                        ${supPhone ? `<span class="copy-phone" data-phone="${supPhone}" style="cursor: pointer; color: var(--accent-color); margin-left: 5px;" title="Clique para copiar"><i class="fas fa-copy"></i></span>` : ''}
-                    </div>
-                    <div style="font-size: 0.85em; opacity: 0.7;">
-                        <i class="fas fa-user-tie" style="width: 20px; text-align: center; margin-right: 5px;"></i> Coord: ${formatContact(item.coordenador)}
-                        ${coordPhone ? `<span class="copy-phone" data-phone="${coordPhone}" style="cursor: pointer; color: var(--accent-color); margin-left: 5px;" title="Clique para copiar"><i class="fas fa-copy"></i></span>` : ''}
-                    </div>
-                `;
-                resultsContainer.appendChild(div);
-            });
-
-            // Adicionar event listeners para os botões de copiar
-            document.querySelectorAll('.copy-phone').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const phone = btn.getAttribute('data-phone');
-                    copyPhone(phone, btn);
-                });
-            });
-        });
     </script>
 
     <script src="COPE.js"></script>
-    <script src="../interactive-effects.js"></script>
+    <script src="../interactive-effects.js"></script>    
 </body>
 </html>
