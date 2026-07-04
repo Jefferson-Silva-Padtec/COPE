@@ -435,35 +435,128 @@ function initAgenteRapido() {
         { municipio: "Tres Rios", uf: "RJ", sigla: "TRS", fila: "PLANTA EXTERNA N1/RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
         { municipio: "Valenca", uf: "RJ", sigla: "VLC", fila: "PLANTA EXTERNA N1/RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Jesus Pedruzi (21) 97260-9581" },
         // Adicionando dados faltantes da VIVO que não estão na Fibrasil para garantir a busca
-        { municipio: "LAURO DE FREITAS", uf: "BA", sigla: "LFS", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "SALVADOR", uf: "BA", sigla: "SDR", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "ARACAJU", uf: "SE", sigla: "AJU", fila: "PLANTA EXTERNA N1 / SE", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "JUAZEIRO", uf: "BA", sigla: "JZO", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "RECIFE", uf: "PE", sigla: "RCF", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "OLINDA", uf: "PE", sigla: "OLN", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "PAULISTA", uf: "PE", sigla: "PAU", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "JABOATAO DOS GUARARAPES", uf: "PE", sigla: "JBG", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "CABO DE SANTO AGOSTINHO", uf: "PE", sigla: "CSA", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "CAMARAGIBE", uf: "PE", sigla: "CGB", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "VITORIA DE SANTO ANTAO", uf: "PE", sigla: "VSA", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "CAMPINA GRANDE", uf: "PB", sigla: "CPG", fila: "PLANTA EXTERNA N1 / PB", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "JOAO PESSOA", uf: "PB", sigla: "JPA", fila: "PLANTA EXTERNA N1 / PB", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "SANTA RITA", uf: "PB", sigla: "SRI", fila: "PLANTA EXTERNA N1 / PB", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "NATAL", uf: "RN", sigla: "NTL", fila: "PLANTA EXTERNA N1 / RN", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "FORTALEZA", uf: "CE", sigla: "FOR", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "MARACANAU", uf: "CE", sigla: "MCU", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "CAUCAIA", uf: "CE", sigla: "CAU", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "TIMON", uf: "MA", sigla: "TIM", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }
-    ];
-    const escalaVivo = [
-        { municipio: "ILHEUS", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "EUNAPOLIS", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "ARAPIRACA", uf: "AL", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "ARRAIAL D'AJUDA", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "BARREIRAS", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "GUANAMBI", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "ITABUNA", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "JEQUIE", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "LAGARTO", uf: "SE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "LUIS EDUARDO MAGALHAES", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "MACEIO", uf: "AL", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "NUR-NUCLEO URBANO", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "PAULO AFONSO", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "PORTO SEGURO", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "SERRINHA", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "TEIXEIRA DE FREITAS", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "TRANCOSO", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "VALENCA", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "VITORIA DA CONQUISTA", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "ALAGOINHAS", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "CAMACARI", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "ESTANCIA", uf: "SE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "FEIRA DE SANTANA", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "ITABAIANA", uf: "SE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "LAURO DE FREITAS", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "CAMACARI", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "LAURO DE FREITAS", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "SALVADOR", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "SIMOES FILHO", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "ARACAJU", uf: "SE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "ARACAJU", uf: "SE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "NOSSA SENHORA DO SOCORRO", uf: "SE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "NOSSA SENHORA DO SOCORRO", uf: "SE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "SENHOR DO BONFIM", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "JUAZEIRO", uf: "BA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "PETROLINA", uf: "PE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "PETROLINA", uf: "PE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "CARUARU", uf: "PE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "GARANHUNS", uf: "PE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "RECIFE", uf: "PE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "OLINDA", uf: "PE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "OLINDA", uf: "PE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "PAULISTA", uf: "PE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "JABOATAO DOS GUARARAPES", uf: "PE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "JABOATAO DOS GUARARAPES", uf: "PE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "CABO DE SANTO AGOSTINHO", uf: "PE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "CAMARAGIBE", uf: "PE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "VITORIA DE SANTO ANTAO", uf: "PE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "CABO DE SANTO AGOSTINHO", uf: "PE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "CAMARAGIBE", uf: "PE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "PAULISTA", uf: "PE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "RECIFE", uf: "PE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "CAMPINA GRANDE", uf: "PB", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "JOAO PESSOA", uf: "PB", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "JOAO PESSOA", uf: "PB", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "SANTA RITA", uf: "PB", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "SANTA RITA", uf: "PB", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "CABEDELO", uf: "PB", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "CABEDELO", uf: "PB", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "MOSSORO", uf: "RN", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "PARNAMIRIM", uf: "RN", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "PARNAMIRIM", uf: "RN", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "NATAL", uf: "RN", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "NATAL", uf: "RN", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "FORTALEZA", uf: "CE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "FORTALEZA", uf: "CE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "MARACANAU", uf: "CE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "MARACANAU", uf: "CE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "CAUCAIA", uf: "CE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "CAUCAIA", uf: "CE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "TERESINA", uf: "PI", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "TERESINA", uf: "PI", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "TIMON", uf: "MA", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }, { municipio: "JUAZEIRO DO NORTE", uf: "CE", coordenador: "Bruno Leonardo Bezerra De Araujo Favoreto (+55(41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }
-    ];
+        { municipio: "LAURO DE FREITAS", uf: "BA", sigla: "LFS", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
+        { municipio: "SALVADOR", uf: "BA", sigla: "SDR", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
+        { municipio: "ARACAJU", uf: "SE", sigla: "AJU", fila: "PLANTA EXTERNA N1 / SE", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
+        { municipio: "JUAZEIRO", uf: "BA", sigla: "JZO", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
+        { municipio: "RECIFE", uf: "PE", sigla: "RCF", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
+        { municipio: "OLINDA", uf: "PE", sigla: "OLN", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
+        { municipio: "PAULISTA", uf: "PE", sigla: "PAU", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
+        { municipio: "JABOATAO DOS GUARARAPES", uf: "PE", sigla: "JBG", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
+        { municipio: "CABO DE SANTO AGOSTINHO", uf: "PE", sigla: "CSA", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
+        { municipio: "CAMARAGIBE", uf: "PE", sigla: "CGB", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
+        { municipio: "VITORIA DE SANTO ANTAO", uf: "PE", sigla: "VSA", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
+        { municipio: "CAMPINA GRANDE", uf: "PB", sigla: "CPG", fila: "PLANTA EXTERNA N1 / PB", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
+        { municipio: "JOAO PESSOA", uf: "PB", sigla: "JPA", fila: "PLANTA EXTERNA N1 / PB", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
+        { municipio: "SANTA RITA", uf: "PB", sigla: "SRI", fila: "PLANTA EXTERNA N1 / PB", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
+        { municipio: "NATAL", uf: "RN", sigla: "NTL", fila: "PLANTA EXTERNA N1 / RN", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
+        { municipio: "FORTALEZA", uf: "CE", sigla: "FOR", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
+        { municipio: "MARACANAU", uf: "CE", sigla: "MCU", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
+        { municipio: "CAUCAIA", uf: "CE", sigla: "CAU", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
+        { municipio: "TIMON", uf: "MA", sigla: "TIM", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }
+    ];const escalonamentoCompleto = [
+    { municipio: "ILHEUS", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
+    { municipio: "EUNAPOLIS", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
+    { municipio: "ARAPIRACA", uf: "AL", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
+    { municipio: "ARRAIAL D'AJUDA", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
+    { municipio: "BARREIRAS", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
+    { municipio: "GUANAMBI", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
+    { municipio: "ITABUNA", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
+    { municipio: "JEQUIE", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
+    { municipio: "LAGARTO", uf: "SE", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
+    { municipio: "LUIS EDUARDO MAGALHAES", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
+    { municipio: "PORTO SEGURO", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
+    { municipio: "SANTO ANTONIO DE JESUS", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
+    { municipio: "TEIXEIRA DE FREITAS", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
+    { municipio: "TRANCOSO", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
+    { municipio: "VITORIA DA CONQUISTA", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
+    { municipio: "JARAGUA", uf: "GO", coordenador: "Alessandro José Lemes (63 9 99914354)", supervisor: "Creone Moreira Souto (62 9 84190813)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
+    { municipio: "JATAI", uf: "GO", coordenador: "Danilo Antonio de Melo (62 9 84706369)", supervisor: "Everton Valim Menezes (64 9 84388830)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
+    { municipio: "ITABERAI", uf: "GO", coordenador: "Daniel Domingos Viana (62 9 84043448)", supervisor: "Alessandro Rezende Da Silva (62 9 84006294)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
+    { municipio: "INHUMAS", uf: "GO", coordenador: "Daniel Domingos Viana (62 9 84043448)", supervisor: "Alessandro Rezende Da Silva (62 9 84006294)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
+    { municipio: "MINEIROS", uf: "GO", coordenador: "Danilo Antonio de Melo (62 9 84706369)", supervisor: "Everton Valim Menezes (64 9 84388830)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
+    { municipio: "MORRINHOS", uf: "GO", coordenador: "Danilo Antonio de Melo (62 9 84706369)", supervisor: "Josiel Alves De Oliveira (62 9 98589604)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
+    { municipio: "CATALÃO", uf: "GO", coordenador: "Danilo Antonio de Melo (62 9 84706369)", supervisor: "Josiel Alves De Oliveira (62 9 98589604)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
+    { municipio: "CALDAS NOVAS", uf: "GO", coordenador: "Danilo Antonio de Melo (62 9 84706369)", supervisor: "Josiel Alves De Oliveira (62 9 98589604)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
+    { municipio: "PALMAS", uf: "TO", coordenador: "Alessandro José Lemes (63 9 99914354)", supervisor: "Ribas Junios Gomes Campelo (63 9 99447319)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
+    { municipio: "PALMAS", uf: "TO", coordenador: "Alessandro José Lemes (63 9 99914354)", supervisor: "Ramohn Caetano Da Silva (63 9 99926212)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
+    { municipio: "ARAGUAÍNA", uf: "TO", coordenador: "Alessandro José Lemes (63 9 99914354)", supervisor: "Ribas Junios Gomes Campelo (63 9 99447319)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
+    { municipio: "ARAGUAÍNA", uf: "TO", coordenador: "Alessandro José Lemes (63 9 99914354)", supervisor: "Ramohn Caetano Da Silva (63 9 99926212)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
+    { municipio: "TRES LAGOAS", uf: "MS", coordenador: "Joaquim De Morais Silva ((67) 9980-95250)", supervisor: "Anderson Rodrigues Da Silva/ Johnny De Matos ((67) 9963-69476/ (67) 993075445)", gerente: "Gilson Xavier Ferreira ((67) 9923-45090)" },
+    { municipio: "PRIMAVERA DO LESTE", uf: "MT", coordenador: "Vitor Hugo Fabricio Godoy ((67) 99847-6993)", supervisor: "Michael Chabalin Ferraz ((65) 9981-02437)", gerente: "Gilson Xavier Ferreira ((67) 9923-45090)" },
+    { municipio: "TANGARA DA SERRA", uf: "MT", coordenador: "Vitor Hugo Fabricio Godoy ((67) 99847-6993)", supervisor: "Michael Chabalin Ferraz ((65) 9981-02437)", gerente: "Gilson Xavier Ferreira ((67) 9923-45090)" },
+    { municipio: "SINOP", uf: "MT", coordenador: "Vitor Hugo Fabricio Godoy ((67) 99847-6993)", supervisor: "Michael Chabalin Ferraz ((65) 9981-02437)", gerente: "Gilson Xavier Ferreira ((67) 9923-45090)" },
+    { municipio: "LUCAS DO RIO VERDE", uf: "MT", coordenador: "Vitor Hugo Fabricio Godoy ((67) 99847-6993)", supervisor: "Michael Chabalin Ferraz ((65) 9981-02437)", gerente: "Gilson Xavier Ferreira ((67) 9923-45090)" },
+    { municipio: "CAMPO VERDE", uf: "MT", coordenador: "Vitor Hugo Fabricio Godoy ((67) 99847-6993)", supervisor: "Michael Chabalin Ferraz ((65) 9981-02437)", gerente: "Gilson Xavier Ferreira ((67) 9923-45090)" },
+    { municipio: "SORRISO", uf: "MT", coordenador: "Vitor Hugo Fabricio Godoy ((67) 99847-6993)", supervisor: "Michael Chabalin Ferraz ((65) 9981-02437)", gerente: "Gilson Xavier Ferreira ((67) 9923-45090)" },
+    { municipio: "NOVA MUTUM", uf: "MT", coordenador: "Vitor Hugo Fabricio Godoy ((67) 99847-6993)", supervisor: "Michael Chabalin Ferraz ((65) 9981-02437)", gerente: "Gilson Xavier Ferreira ((67) 9923-45090)" },
+    { municipio: "Alegrete", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
+    { municipio: "Cachoeira do Sul", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
+    { municipio: "Ijuí", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
+    { municipio: "Palmeira das Missões", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
+    { municipio: "Canela", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Diego Dos Santos Machado (5551998726541)", gerente: "Maxchel Joner Da Silva (51981209962)" },
+    { municipio: "Capão da Canoa", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Anderson Andrade Marins (5551997791640)", gerente: "Michel Romanini (44984552705)" },
+    { municipio: "Carazinho", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Cassio Fernando Rocha Oliveira (55(54) 9960-84221)", gerente: "Maxchel Joner Da Silva (51981209962)" },
+    { municipio: "Carlos Barbosa", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Diego Dos Santos Machado (5551998726541)", gerente: "Maxchel Joner Da Silva (51981209962)" },
+    { municipio: "Charqueadas", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Diego Richter Silva (5551997549214)", gerente: "Michel Romanini (44984552705)" },
+    { municipio: "Dois Irmãos", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Marcio Andre da Rosa Mendes (5551995892075)", gerente: "Michel Romanini (44984552705)" },
+    { municipio: "Erechim", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Cassio Fernando Rocha Oliveira (55(54) 9960-84221)", gerente: "Maxchel Joner Da Silva (51981209962)" },
+    { municipio: "Estrela", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Diego Dos Santos Machado (5551998726541)", gerente: "Maxchel Joner Da Silva (51981209962)" },
+    { municipio: "Flores da Cunha", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Anderson De Lima Velho 54997073335)", gerente: "Maxchel Joner Da Silva (51981209962)" },
+    { municipio: "Garibaldi", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Diego Dos Santos Machado (5551998726541)", gerente: "Maxchel Joner Da Silva (51981209962)" },
+    { municipio: "Gramado", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Diego Dos Santos Machado (5551998726541)", gerente: "Maxchel Joner Da Silva (51981209962)" },
+    { municipio: "Igrejinha", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Marcio Andre da Rosa Mendes (5551995892075)", gerente: "Michel Romanini (44984552705)" },
+    { municipio: "Santa Rosa", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
+    { municipio: "Ivotí", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Marcio Andre da Rosa Mendes (5551995892075)", gerente: "Michel Romanini (44984552705)" },
+    { municipio: "Lagoa Vermelha", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Cassio Fernando Rocha Oliveira (55(54) 9960-84221)", gerente: "Maxchel Joner Da Silva (51981209962)" },
+    { municipio: "Lajeado", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Diego Dos Santos Machado (5551998726541)", gerente: "Maxchel Joner Da Silva (51981209962)" },
+    { municipio: "Nova Petrópolis", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Diego Dos Santos Machado (5551998726541)", gerente: "Maxchel Joner Da Silva (51981209962)" },
+    { municipio: "Osório", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Anderson Andrade Marins (5551997791640)", gerente: "Michel Romanini (44984552705)" },
+    { municipio: "Sant'Ana do Livramento", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
+    { municipio: "Santo Ângelo", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
+    { municipio: "Três de Maio", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
+    { municipio: "Uruguaiana", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
+    { municipio: "São Marcos", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Anderson De Lima Velho 54997073335)", gerente: "Maxchel Joner Da Silva (51981209962)" },
+    { municipio: "Sarandi", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Cassio Fernando Rocha Oliveira (55(54) 9960-84221)", gerente: "Maxchel Joner Da Silva (51981209962)" },
+    { municipio: "Taquara", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Marcio Andre da Rosa Mendes (5551995892075)", gerente: "Michel Romanini (44984552705)" },
+    { municipio: "Teutônia", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Diego Dos Santos Machado (5551998726541)", gerente: "Maxchel Joner Da Silva (51981209962)" },
+    { municipio: "Torres", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Anderson Andrade Marins (5551997791640)", gerente: "Michel Romanini (44984552705)" },
+    { municipio: "Tramandaí", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Anderson Andrade Marins (5551997791640)", gerente: "Michel Romanini (44984552705)" },
+    { municipio: "Venâncio Aires", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
+    { municipio: "Bagé", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Deomar Almeida De Oliveira (53984254561)", gerente: "Maxchel Joner da Silva (51981209962)" },
+    { municipio: "Vacaria", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Cassio Fernando Rocha Oliveira (55(54) 9960-84221)", gerente: "Maxchel Joner Da Silva (51981209962)" },
+    { municipio: "Camaquã", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Deomar Almeida De Oliveira (53984254561)", gerente: "Maxchel Joner da Silva (51981209962)" },
+    { municipio: "Veranópolis", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Diego Dos Santos Machado (5551998726541)", gerente: "Maxchel Joner Da Silva (51981209962)" },
+    { municipio: "Xangri-lá", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Anderson Andrade Marins (5551997791640)", gerente: "Michel Romanini (44984552705)" },
+    { municipio: "ANGRA DOS REIS", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "ARARUAMA", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "ARMACAO DOS BUZIOS", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "BARRA DO PIRAI", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "BARRA MANSA", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "CABO FRIO", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "CAMPOS DOS GOYTACAZES", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "IGUABA GRANDE", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "ITAPERUNA", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "MANGARATIBA", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "NITEROI", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "NOVA IGUACU", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "PARATY", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "PETROPOLIS", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "RESENDE", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "RIO BONITO", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "RIO DAS OSTRAS", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "SAO PEDRO DA ALDEIA", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "TERESOPOLIS", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "TRES RIOS", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "VALENCA", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
+    { municipio: "VOLTA REDONDA", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" }
+];
 
     // Função para limpar, deduplicar e enriquecer os dados da VIVO
     const processarDadosVivo = () => {
         // 1. Deduplicar usando um Map com chave "municipio-uf"
         const uniqueVivoMap = new Map();
-        escalaVivo.forEach(item => {
+        escalonamentoCompleto.forEach(item => {
             const key = `${item.municipio.toUpperCase().trim()}-${item.uf.toUpperCase().trim()}`;
             if (!uniqueVivoMap.has(key)) {
                 uniqueVivoMap.set(key, item);
@@ -481,16 +574,16 @@ function initAgenteRapido() {
             if (match) {
                 return {
                     ...vivoItem,
-                    fila: match.fila || vivoItem.fila,
-                    eps: match.eps || vivoItem.eps,
-                    sigla: match.sigla || vivoItem.sigla
+                    fila: match.fila || vivoItem.fila || 'Não informado',
+                    eps: match.eps || vivoItem.eps || 'Não informado',
+                    sigla: match.sigla || vivoItem.sigla || 'N/A'
                 };
             }
             return vivoItem; // Retorna o item original se não houver correspondência
         });
     };
 
-    const escalaVivoProcessada = processarDadosVivo();
+    let escalaVivoProcessada = processarDadosVivo();
 
     let activeAgenteSource = null;
 
@@ -582,6 +675,7 @@ function initAgenteRapido() {
             div.className = 'agente-result-card';
             const supPhone = extractPhone(item.supervisor);
             const coordPhone = extractPhone(item.coordenador);
+            const gerentePhone = extractPhone(item.gerente);
 
             let contentHTML = `
                 <div class="agente-card-header">
@@ -607,6 +701,10 @@ function initAgenteRapido() {
                         <i class="fas fa-user-tie"></i> Coord: ${formatContact(item.coordenador)}
                         ${coordPhone ? `<span class="copy-phone" data-phone="${coordPhone}" title="Clique para copiar"><i class="fas fa-copy"></i></span>` : ''}
                     </div>
+                    <div>
+                        <i class="fas fa-user-shield"></i> Gerente: ${formatContact(item.gerente)}
+                        ${gerentePhone ? `<span class="copy-phone" data-phone="${gerentePhone}" title="Clique para copiar"><i class="fas fa-copy"></i></span>` : ''}
+                    </div>
                 </div>`;
             
             div.innerHTML = contentHTML;
@@ -620,6 +718,85 @@ function initAgenteRapido() {
             });
         });
     };
+
+    // --- Funções de Importação e Exportação ---
+
+    function exportarContatosCSV(exportarTodos = false) {
+        let dadosParaExportar;
+        let nomeArquivo = 'contatos.csv';
+
+        if (exportarTodos) {
+            // Combina, remove duplicatas e exporta tudo
+            const todosContatosMap = new Map();
+            
+            // Adiciona Fibrasil primeiro
+            baseDadosFibra.forEach(item => {
+                const key = `${item.municipio.toUpperCase().trim()}-${item.uf.toUpperCase().trim()}`;
+                if (!todosContatosMap.has(key)) {
+                    todosContatosMap.set(key, item);
+                }
+            });
+
+            // Adiciona Vivo (já processado), sobrescrevendo ou adicionando
+            escalaVivoProcessada.forEach(item => {
+                const key = `${item.municipio.toUpperCase().trim()}-${item.uf.toUpperCase().trim()}`;
+                todosContatosMap.set(key, { ...todosContatosMap.get(key), ...item });
+            });
+
+            dadosParaExportar = Array.from(todosContatosMap.values());
+            nomeArquivo = 'contatos_completos.csv';
+            
+        } else {
+            if (!activeAgenteSource) {
+                alert("Por favor, selecione uma fonte de dados (FIBRASIL ou VIVO) para exportar.");
+                return;
+            }
+            dadosParaExportar = activeAgenteSource === 'fibrasil' ? baseDadosFibra : escalaVivoProcessada;
+            nomeArquivo = `contatos_${activeAgenteSource}.csv`;
+        }
+
+        if (!dadosParaExportar || dadosParaExportar.length === 0) {
+            alert("Não há dados para exportar.");
+            return;
+        }
+
+        const csv = Papa.unparse(dadosParaExportar);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", nomeArquivo);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function importarContatos() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = e => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = event => {
+                try {
+                    const novosContatos = JSON.parse(event.target.result);
+                    // Adiciona os novos contatos à base principal
+                    escalonamentoCompleto.push(...novosContatos);
+                    // Reprocessa a base da VIVO para incluir os novos dados e remover duplicatas
+                    escalaVivoProcessada = processarDadosVivo();
+                    alert(`${novosContatos.length} contatos importados com sucesso! A lista foi atualizada.`);
+                } catch (error) {
+                    alert(`Erro ao importar o arquivo: ${error.message}`);
+                }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    }
 
     openBtn.addEventListener('dblclick', openAgenteRapidoModal);
     closeBtn.addEventListener('click', closeAgenteRapidoModal);
