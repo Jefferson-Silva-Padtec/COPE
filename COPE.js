@@ -454,7 +454,17 @@ function initAgenteRapido() {
         { municipio: "MARACANAU", uf: "CE", sigla: "MCU", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
         { municipio: "CAUCAIA", uf: "CE", sigla: "CAU", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
         { municipio: "TIMON", uf: "MA", sigla: "TIM", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }
-    ];const escalonamentoCompleto = [
+    ];
+    const escalaMG = [
+        { municipio: "DIVINOPOLIS", uf: "MG", coordenador: "Juliano Nunes de Oliveira (31995919305)", supervisor: "Roberto Valeriano de Souza ((31) 97104-0256)", gerente: "Bruno Junqueira Leitao de Almeida (31999102830)" },
+        { municipio: "IBIRITE", uf: "MG", coordenador: "Juliano Nunes de Oliveira (31995919305)", supervisor: "Roberto Valeriano de Souza ((31) 97104-0256)", gerente: "Bruno Junqueira Leitao de Almeida (31999102830)" },
+        { municipio: "SANTA LUZIA", uf: "MG", coordenador: "Juliano Nunes de Oliveira (31995919305)", supervisor: "Roberto Valeriano de Souza ((31) 97104-0256)", gerente: "Bruno Junqueira Leitao de Almeida (31999102830)" },
+        { municipio: "NOVA LIMA", uf: "MG", coordenador: "Juliano Nunes de Oliveira (31995919305)", supervisor: "Jair Rosa de Melo ((31) 99955-7573)", gerente: "Bruno Junqueira Leitao de Almeida (31999102830)" },
+        { municipio: "RIBEIRÃO DA NEVES", uf: "MG", coordenador: "Juliano Nunes de Oliveira (31995919305)", supervisor: "Jair Rosa de Melo ((31) 99955-7573)", gerente: "Bruno Junqueira Leitao de Almeida (31999102830)" },
+        { municipio: "SETE LAGOAS", uf: "MG", coordenador: "Juliano Nunes de Oliveira (31995919305)", supervisor: "Jair Rosa de Melo ((31) 99955-7573)", gerente: "Bruno Junqueira Leitao de Almeida (31999102830)" }
+    ];
+    const escalonamentoCompleto = [
+        ...escalaMG,
     { municipio: "ILHEUS", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
     { municipio: "EUNAPOLIS", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
     { municipio: "ARAPIRACA", uf: "AL", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
