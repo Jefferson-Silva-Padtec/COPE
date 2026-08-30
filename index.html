@@ -27,8 +27,8 @@
             <div class="nav-section">
                 <h3 class="nav-section-title">Navegação</h3>
                 <ul>
-                    <li class="active"><a href="#" onclick="navigateTo('home'); return false;"><i class="fas fa-home"></i> <span>Home</span></a></li>
-                    <li><a href="https://gemini.google.com/gem/b1fe25175fb1?ts=69432093" class="nav-new"><i class="fas fa-robot"></i> <span>Agente COPE</span><span class="badge-nav-new">⭐ new</span></a></li>
+                    <li class="active"><a href="#" onclick="navigateTo('links-cope'); return false;"><i class="fas fa-home"></i> <span>Home</span></a></li>
+                    <li><a href="https://gemini.google.com/gem/b1fe25175fb1?ts=69432093"><i class="fas fa-robot"></i> <span>Agente COPE</span></a></li>
                 </ul>
             </div>
 
@@ -36,10 +36,8 @@
             <div class="nav-section">
                 <h3 class="nav-section-title">Acessos Rápidos</h3>
                 <ul>    
-                    <li><a href="#" onclick="navigateTo('links-cope'); return false;"><i class="fas fa-link"></i> <span>Links COPE</span></a></li>
-                    <li><a href="#" onclick="navigateTo('links-fibrasil'); return false;"><i class="fas fa-link"></i> <span>Links Fibrasil</span></a></li>
+                    <li><a href="#" onclick="navigateTo('links-fibrasil'); return false;"><i class="fas fa-link"></i> <span>Links VIVO | FIBRASIL</span></a></li>
                     <li><a href="#" onclick="navigateTo('ferramentas'); return false;"><i class="fas fa-tools"></i> <span>Lista de Ferramentas</span></a></li>
-                    <li><a href="#" ondblclick="openAgenteRapidoModal(event)" onclick="return false;" title="Clique duas vezes para abrir" style="color: #f7bf05;"><i class="fas fa-bolt"></i> <span>Agente rápido Escalonamento</span></a></li>
                 </ul>
             </div>
 
@@ -49,6 +47,7 @@
                 <ul>
                     <li><a href="https://fibrasilferramentas.padtec.com.br/cope_analise/" class="nav-orange"><i class="fas fa-broom"></i> <span>Analisar Dados</span></a></li>
                     <li><a href="https://fibrasilferramentas.padtec.com.br/cope_analise/?page=volumetria" class="nav-orange"><i class="fas fa-chart-bar"></i> <span>Volumetria COPE</span></a></li>
+                    <li><a href="#" id="btn-open-agente-rapido" class="nav-blue" onclick="navigateTo('escalonamento'); return false;" title="Clique para abrir o Escalonamento Centralizado" style="cursor: pointer;"><i class="fas fa-network-wired"></i> <span>ESCALONAMENTO CENTRALIZADO</span></a></li>
                 </ul>
             </div>
         </nav>
@@ -61,50 +60,12 @@
     </aside>
 
     <main class="content">
-        <!-- SEÇÃO: HOME -->
-        <section id="home" class="page-section active">
-            <div class="card-container">
-                <a href="https://gemini.google.com/gem/b1fe25175fb1?ts=69432093" class="card card-link card-featured">
-                    <span class="badge-novidade">NOVIDADE</span>
-                    <h2>Agente COPE</h2>
-                    <p>Novo assistente inteligente para auxiliar você.</p>
-                </a>
-                
-                <a href="#" onclick="showEnvioModal(event)" class="card card-link card-orange">
-                    <span class="badge-novidade">AUTOMATIZADO</span>
-                    <h2>ENVIO PARCIAL</h2>
-                    <p>Envio Automatizado.</p>
-                </a>
-
-                <a href="#" onclick="navigateTo('links-cope'); return false;" class="card card-link card-orange">
-                    <h2>Links COPE</h2>
-                    <p>Coleção de links importantes relacionados a COPE.</p>
-                </a>
-
-                <a href="https://fibrasilferramentas.padtec.com.br/cope_analise/?page=volumetria" class="card card-link card-orange">
-                    <h2>Volumetria COPE</h2>
-                    <p>Relatórios e dashboards de volumetria.</p>
-                </a>
-
-                <a href="https://fibrasilferramentas.padtec.com.br/cope_analise/" class="card card-link card-orange">
-                    <h2>Analise e Limpeza de Dados</h2>
-                    <p style="font-size:0.95em; margin:0;">Verifica SP/CTO e remove Notificação TA VIVO</p>
-                </a>
-
-                <a href="#" onclick="navigateTo('links-fibrasil'); return false;" class="card card-link">
-                    <h2>Links Fibrasil</h2>
-                    <p style="font-size:0.9em; margin:0;">Necessário login com usuario .ext@fibrasil</p>
-                </a>
-            </div>
-        </section>
-
-        <!-- SEÇÃO: LINKS COPE -->
-        <section id="links-cope" class="page-section">
+        <!-- SEÇÃO: LINKS COPE (INICIAL / HOME) -->
+        <section id="links-cope" class="page-section active">
             <h1 style="color: #FF8C00; text-align: center; margin-bottom: 50px; font-size: 4em; font-weight: bold;">COPE</h1>
 
             <div class="card-container">
                 <a href="#" onclick="showEnvioModal(event)" class="card card-link card-orange">
-                    <span class="badge-novidade">NOVIDADE</span>
                     <h2>ENVIO PARCIAL</h2>
                     <p>Envio Automatizado.</p>
                 </a>
@@ -151,25 +112,23 @@
                     </div>
                 </a>
 
-                <a class="card-link" href="https://padtec.sharepoint.com/:x:/r/sites/OperacoesFiBrasil/_layouts/15/Doc.aspx?sourcedoc=%7B" target="_blank" rel="noopener noreferrer" aria-label="Abrir SOBREAVISO PE">
-                    <div class="card card-orange">
-                        <h2>SOBREAVISO PLANTA EXTERNA</h2>
-                        <p>Sobreaviso Rede Externa_Ver.5- 2025_02062025.xlsx</p>
-                    </div>
+                <a href="#" onclick="navigateTo('escalonamento'); return false;" class="card card-link card-blue" aria-label="Abrir Escalonamento Centralizado">
+                    <span class="badge-atualizado">ATUALIZADO</span>
+                    <h2>Escalonamento Centralizado</h2>
+                    <p>Consulta e comparativo de contatos de escalonamento VIVO e EPS.</p>
                 </a>
             </div>
         </section>
 
-        <!-- SEÇÃO: LINKS FIBRASIL -->
+        <!-- SEÇÃO: LINKS VIVO | FIBRASIL -->
         <section id="links-fibrasil" class="page-section">
-            <h1 style="color: #00b7ff; text-align: center; margin-bottom: 50px; font-size: 4em; font-weight: bold;">FIBRASIL</h1>
+            <h1 style="color: #00b7ff; text-align: center; margin-bottom: 50px; font-size: 4em; font-weight: bold;">LINKS VIVO | FIBRASIL</h1>
 
             <div class="card-container">
-                <a class="card-link" href="https://fibrasilcorp.sharepoint.com/:x:/r/sites/OPERAESFIBRASIL/_layouts/15/doc2.aspx?sourcedoc=%7BC250FBDD-3153-4EB8-90C2-1328C504D5B3%7D&file=Sobreaviso%20Rede%20Externa_Ver.5-%202025_02062025.xlsx&action=default&mobileredirect=true" target="_blank" rel="noopener noreferrer" aria-label="Abrir SOBREAVISO PE">
-                    <div class="card">
-                        <h2>SOBREAVISO PLANTA EXTERNA</h2>
-                        <p>Sobreaviso Rede Externa_Ver.5- 2025_02062025.xlsx</p>
-                    </div>
+                <a href="#" onclick="navigateTo('escalonamento'); return false;" class="card card-link card-blue" aria-label="Abrir Escalonamento Centralizado">
+                    <span class="badge-atualizado">ATUALIZADO</span>
+                    <h2>Escalonamento Centralizado</h2>
+                    <p>Consulta e comparativo de contatos de escalonamento VIVO e EPS.</p>
                 </a>
 
                 <a class="card-link" href="https://app.powerbi.com/groups/me/apps/6506522b-dc4a-47fb-9fb7-d785bac4c40d/reports/faf20964-4999-4b72-af50-7251726fcb60/7fd4ff817170b19d1a60?ctid=df1b464d-c105-4b6b-95c1-c07df632da76&experience=power-bi" target="_blank" rel="noopener noreferrer" aria-label="Abrir BI Indisponibilidade">
@@ -243,6 +202,30 @@
                 </a>
             </div>
         </section>
+
+        <!-- SEÇÃO: ESCALONAMENTO CENTRALIZADO VIVO | EPS (NOVA PÁGINA) -->
+        <section id="escalonamento" class="page-section page-escalonamento-section">
+            <div class="escalonamento-page-header">
+                <div class="escalonamento-header-left">
+                    <i class="fas fa-network-wired" style="font-size: 2.2em; color: #c084fc;"></i>
+                    <div>
+                        <h1 class="escalonamento-page-title">ESCALONAMENTO CENTRALIZADO VIVO | EPS</h1>
+                    </div>
+                </div>
+                <div class="escalonamento-header-actions">
+                    <button class="agente-btn-action" onclick="toggleAllCities(true)" title="Expandir todas as cidades"><i class="fas fa-expand-alt"></i> <span>Expandir</span></button>
+                    <button class="agente-btn-action" onclick="toggleAllCities(false)" title="Recolher todas as cidades"><i class="fas fa-compress-alt"></i> <span>Recolher</span></button>
+                    <button class="agente-btn-action" onclick="exportarContatosCSV(true)" title="Exportar dados de Escalonamento em CSV"><i class="fas fa-file-csv"></i> <span>Exportar CSV</span></button>
+                </div>
+            </div>
+
+            <div class="agente-search-box">
+                <i class="fas fa-search" style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #c084fc; font-size: 1.25em;"></i>
+                <input type="text" id="agente-search-input" oninput="if(window.searchAgente){window.searchAgente(event);}" onkeyup="if(window.searchAgente){window.searchAgente(event);}" placeholder="Pesquise por município, UF, sigla ou EPS (ex: Alegrete, RS, ALG, Razao Info)..." autocomplete="off">
+            </div>
+
+            <div id="agente-search-results" class="agente-results-page-container"></div>
+        </section>
     </main>
 
     <!-- Modal de Confirmação Envio Parcial -->
@@ -256,35 +239,6 @@
         </div>
     </div>
 
-    <!-- Modal Agente Rápido -->
-    <div id="agente-rapido-modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(4px);">
-        <div style="background-color: var(--card-background); margin: 10% auto; padding: 30px; border: 2px solid var(--accent-color); width: 90%; max-width: 600px; border-radius: 15px; box-shadow: 0 0 20px rgba(0,0,0,0.5); position: relative; color: var(--text-color);">
-            <span id="close-agente-rapido-modal" style="position: absolute; top: 15px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; color: var(--accent-color); transition: color 0.3s;">&times;</span>
-            <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 25px;">
-                <h2 class="agente-main-title" style="margin-bottom: 0;">Escalonamento Planta Externa</h2>
-                <div style="display: flex; gap: 10px;">
-                    <button onclick="importarContatos()" title="Importar contatos" style="background: none; border: none; color: var(--accent-color); font-size: 1.2em; cursor: pointer;"><i class="fas fa-upload"></i></button>
-                    <button onclick="exportarContatosCSV(false)" ondblclick="exportarContatosCSV(true)" title="Clique para exportar a base selecionada. Duplo clique para exportar TUDO." style="background: none; border: none; color: var(--accent-color); font-size: 1.2em; cursor: pointer;"><i class="fas fa-file-csv"></i></button>
-                </div>
-            </div>
-
-            <div id="agente-botoes-container" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 25px;">
-                <button id="btn-agente-fibrasil" class="agente-operadora-btn">FIBRASIL</button>
-                <button id="btn-agente-vivo" class="agente-operadora-btn">VIVO</button>
-            </div>
-
-            <div id="agente-search-container" class="collapsible-content">
-                <h2 id="agente-search-title" style="text-align: center; color: var(--accent-color); margin-bottom: 25px; font-weight: bold; text-transform: uppercase;"></h2>
-                
-                <div style="position: relative; margin-bottom: 20px;">
-                    <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-color); opacity: 0.7;"></i>
-                    <input type="text" id="agente-search-input" placeholder="Digite o município ou sigla..." style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--background-color); color: var(--text-color); font-size: 1.1em; outline: none; box-sizing: border-box;">
-                </div>
-                
-                <div id="agente-search-results" style="max-height: 300px; overflow-y: auto; padding-right: 5px;"></div>
-            </div>
-        </div>
-    </div>
 
     <!-- Modal de Teste de Rede -->
     <div id="network-test-modal" class="network-test-modal">
