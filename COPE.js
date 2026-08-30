@@ -167,9 +167,17 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.sidebar-nav li').forEach(li => li.classList.remove('active'));
         const activeLink = document.querySelector(`.sidebar-nav a[onclick*="'${sectionId}'"]`);
         if (activeLink && activeLink.parentElement) activeLink.parentElement.classList.add('active');
-        // 4. Gerencia classes específicas de página
-        if (sectionId === 'links-cope') document.body.classList.add('page-links-cope');
-        else document.body.classList.remove('page-links-cope');
+        
+        // 4. Renderiza contatos se for a seção de escalonamento
+        if (sectionId === 'escalonamento') {
+            if (typeof window.renderSpreadsheet === 'function' && window.unifiedCities) {
+                window.renderSpreadsheet(window.unifiedCities, false);
+            }
+            const searchInput = document.getElementById('agente-search-input');
+            if (searchInput) {
+                setTimeout(() => searchInput.focus(), 150);
+            }
+        }
         // 5. Rola para o topo
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -274,508 +282,988 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initAgenteRapido() {
     const modal = document.getElementById('agente-rapido-modal');
-    const openBtn = document.querySelector('a[ondblclick="openAgenteRapidoModal(event)"]');
+    const openBtn = document.getElementById('btn-open-agente-rapido') || document.querySelector('a[href*="openAgenteRapidoModal"]') || document.querySelector('a[onclick*="openAgenteRapidoModal"]');
     const closeBtn = document.getElementById('close-agente-rapido-modal');
 
-    if (!modal || !openBtn || !closeBtn) return;
+    const escalonamentoEPS = [
+        { municipio: "Açailândia", uf: "MA", sigla: "ACD", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Jose Maia de Oliveira / Noturno: Jose Maia de Oliveira Diurno: (98) 986068643 / Noturno: (98) 986068643", gerente: "Diurno: Felipe Silva Santos / Noturno: Felipe Silva Santos Diurno: 98 99165-5413 / Noturno: 98 99165-5413" },
+        { municipio: "Alegrete", uf: "RS", sigla: "ALG", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Altamira", uf: "PA", sigla: "ATM", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Jefferson Sombra / Noturno: Jefferson Sombra Diurno: 91 99373-8853 / Noturno: 91 99373-8853", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Angra Dos Reis", uf: "RJ", sigla: "ARS", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Aracruz", uf: "ES", sigla: "ACZ", fila: "PLANTA EXTERNA N1 / ES", eps: "Hallen", status: "NÃO SIGO", primeiroContato: "", supervisor: "Rogério Sobreira 27 98109-1998", coordenador: "Claudio 27 98107-1871", gerente: "Perin 27 99940-3632" },
+        { municipio: "Araguaína", uf: "TO", sigla: "ARN", fila: "PLANTA EXTERNA N1 / TO", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Juliano Henrique Prestes / Noturno: Juliano Henrique Prestes Diurno: 11 91760-5917 / Noturno: 11 91760-5917", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Arapiraca", uf: "AL", sigla: "AIR", fila: "PLANTA EXTERNA N1 / AL", eps: "R2", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Thiado Matos / Noturno: Ricardo Diurno: 73 99852-4467 / Noturno: 7199742-2205", coordenador: "Diurno/Noturno: Stanley Gonsalvez Diurno/Noturno: 71999033305", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Araruama", uf: "RJ", sigla: "AMA", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Armação Dos Búzios", uf: "RJ", sigla: "ARBU", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Arraial D'Ajuda", uf: "BA", sigla: "ALDA", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Thiado Matos / Noturno: Ricardo Diurno: 73 99852-4467 / Noturno: 7199742-2205", coordenador: "Diurno/Noturno: Stanley Gonsalvez Diurno/Noturno: 71999033305", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Bagé", uf: "RS", sigla: "BGE", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Balsas", uf: "MA", sigla: "BLA", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Jose Maia de Oliveira / Noturno: Jose Maia de Oliveira Diurno: (98) 986068643 / Noturno: (98) 986068643", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Barra Do Piraí", uf: "RJ", sigla: "BPI", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Barra Mansa", uf: "RJ", sigla: "BMA", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Barreiras", uf: "BA", sigla: "BES", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Thiado Matos / Noturno: Ricardo Diurno: 73 99852-4467 / Noturno: 7199742-2205", coordenador: "Diurno/Noturno: Stanley Gonsalvez Diurno/Noturno: 71999033305", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Belém", uf: "PA", sigla: "BLM", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Jefferson Sombra / Noturno: Jefferson Sombra Diurno: 91 99373-8853 / Noturno: 91 99373-8853", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Cabedelo", uf: "PB", sigla: "CBD", fila: "PLANTA EXTERNA N1 / PB", eps: "TECNOMULTI", status: "SIGO", primeiroContato: "Mikaelle Silva De Oliveira/Giselle Esmeralda Do Prado/Vinicius Santos De Lucena/Allana Bernardo Dantas De Araujo/Fatima Maria Agripino Dos Reis/Abimael Anibal Vieira Filho (84) 98661-0163 / (81) 99256-9899 / (81) 98584-4552 / (84) 98749-6846 / (81) 98735-4262 / (81) 99119-5622", supervisor: "Diurno/Noturno: Vinicius Lucena Diurno/Noturno: (86) 99828-0083", coordenador: "FERNANDO FERREIRA Diurno/Noturno: (83) 98753-0979", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Cabo Frio", uf: "RJ", sigla: "CBF", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Cachoeira Do Sul", uf: "RS", sigla: "CCR", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Cachoeiro De Itapemirim", uf: "ES", sigla: "CIM", fila: "PLANTA EXTERNA N1 / ES", eps: "Hallen", status: "SIGO", primeiroContato: "", supervisor: "Rogério Sobreira 27 98109-1998", coordenador: "Claudio 27 98107-1871", gerente: "Perin 27 99940-3632" },
+        { municipio: "Caldas Novas", uf: "GO", sigla: "CLV", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "NÃO SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Wilmon da Silva Guimaraes Neto / Noturno: Wilmon da Silva Guimaraes Neto Diurno: 62 9691-4052 / Noturno: 62 9691-4052", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Camaquã", uf: "RS", sigla: "CAM", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Campo Verde", uf: "MT", sigla: "CZV", fila: "PLANTA EXTERNA N1 / MT  2", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Mauricio  Souza / Noturno: Diurno: 67 9805-7675 / Noturno: 67 9805-7675", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Canaã Dos Carajás", uf: "PA", sigla: "CKJ", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Jefferson Sombra / Noturno: Jefferson Sombra Diurno: 91 99373-8853 / Noturno: 91 99373-8853", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Canela", uf: "RS", sigla: "CEN", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Capanema", uf: "PA", sigla: "CPN", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Jefferson Sombra / Noturno: Jefferson Sombra Diurno: 91 99373-8853 / Noturno: 91 99373-8853", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Capão Da Canoa", uf: "RS", sigla: "KDK", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Capinzal", uf: "SC", sigla: "CNZ", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Cleideson Freitas Diurno/Noturno: (48) 99141-1588", coordenador: "Diruno/Noturno RAFAEL VARGAS Diurno/Noturno: 48 99178-9367", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Carazinho", uf: "RS", sigla: "CIO", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Carlos Barbosa", uf: "RS", sigla: "CLB", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Castanhal", uf: "PA", sigla: "CAH", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Jefferson Sombra / Noturno: Jefferson Sombra Diurno: 91 99373-8853 / Noturno: 91 99373-8853", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Catalão", uf: "GO", sigla: "CTL", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "NÃO SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Wilmon da Silva Guimaraes Neto / Noturno: Wilmon da Silva Guimaraes Neto Diurno: 62 9691-4052 / Noturno: 62 9691-4052", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Charqueadas", uf: "RS", sigla: "CQU", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Concórdia", uf: "SC", sigla: "CDA", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Cleideson Freitas Diurno/Noturno: (48) 99141-1588", coordenador: "Diruno/Noturno RAFAEL VARGAS Diurno/Noturno: 48 99178-9367", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Crato", uf: "CE", sigla: "CTO", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", primeiroContato: "Diogo Araujo (71) 99614-7416", supervisor: "Diurno: Ricardo Alexandre / Noturno: Nelson Barroso Campo Diurno: 71 99742-2205 / Noturno: 88 98164-1839", coordenador: "Diurno/ Noturno: Marcilio Cassiano Sup Campo 85 99411-9484", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Divinópolis", uf: "MG", sigla: "DVL", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Ac-acio Diurno/Noturno: (35) 99757-9489", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno: (31) 98492-6662", gerente: "Diurno/ Noturno: Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Dois Irmãos", uf: "RS", sigla: "DSR", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Erechim", uf: "RS", sigla: "ERE", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Estrela", uf: "RS", sigla: "ETA", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Eunápolis", uf: "BA", sigla: "EUS", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Ricardo Alexandre / Noturno: Nelson Barroso Campo Diurno: 71 99742-2205 / Noturno: 88 98164-1839", coordenador: "Diurno/Noturno: Stanley Gonsalvez Diurno/Noturno: 71999033305", gerente: "Diurno/Noturno: Ramon ger campo Diurno/Noturno: 71 8104-8692" },
+        { municipio: "Flores Da Cunha", uf: "RS", sigla: "FCA", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Formosa", uf: "GO", sigla: "FRM", fila: "PLANTA EXTERNA N1 / GO 3", eps: "ABILITY", status: "SIGO", primeiroContato: "", supervisor: "Diurno:  / Noturno: Uraci Diurno:  / Noturno: 11 94459-4514", coordenador: "Diurno:  / Noturno: Cleiton Neves Diurno:  / Noturno: 11 99820-3955", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Fraiburgo", uf: "SC", sigla: "FGO", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Cleideson Freitas Diurno/Noturno: (48) 99141-1588", coordenador: "Diruno/Noturno RAFAEL VARGAS Diurno/Noturno: 48 99178-9367", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Garanhuns", uf: "PE", sigla: "GUS", fila: "PLANTA EXTERNA N1 / PE 2", eps: "TECNOMULTI", status: "SIGO", primeiroContato: "Mikaelle Silva De Oliveira/Giselle Esmeralda Do Prado/Vinicius Santos De Lucena/Allana Bernardo Dantas De Araujo/Fatima Maria Agripino Dos Reis/Abimael Anibal Vieira Filho (84) 98661-0163 / (81) 99256-9899 / (81) 98584-4552 / (84) 98749-6846 / (81) 98735-4262 / (81) 99119-5622", supervisor: "Diurno/Noturno: Vinicius Lucena Diurno/Noturno: (86) 99828-0083", coordenador: "Manoel Messias Diurno/Noturno: (81) 986834718", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Garibaldi", uf: "RS", sigla: "GRD", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Garopaba", uf: "SC", sigla: "GRB", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Cleideson Freitas Diurno/Noturno: (48) 99141-1588", coordenador: "Diruno/Noturno RAFAEL VARGAS Diurno/Noturno: 48 99178-9367", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Gramado", uf: "RS", sigla: "GDO", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Guanambi", uf: "BA", sigla: "GNB", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Thiado Matos / Noturno: Ricardo Diurno: 73 99852-4467 / Noturno: 7199742-2205", coordenador: "Diurno/Noturno: Stanley Gonsalvez Diurno/Noturno: 71999033305", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Guaraparí", uf: "ES", sigla: "GRI", fila: "PLANTA EXTERNA N1 / ES", eps: "Hallen", status: "SIGO", primeiroContato: "", supervisor: "Rogério Sobreira 27 98109-1998", coordenador: "Claudio 27 98107-1871", gerente: "Perin 27 99940-3632" },
+        { municipio: "Ibirité", uf: "MG", sigla: "IIE", fila: "PLANTA EXTERNA N1 / MG 2", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Ac-acio Diurno/Noturno: (35) 99757-9489", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno: (31) 98492-6662", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: (41) 992656324" },
+        { municipio: "Igrejinha", uf: "RS", sigla: "IJH", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Iguaba Grande", uf: "RJ", sigla: "IGGR", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Ijuí", uf: "RS", sigla: "IJI", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Ilhéus", uf: "BA", sigla: "ILH", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Thiado Matos / Noturno: Ricardo Diurno: 73 99852-4467 / Noturno: 7199742-2205", coordenador: "Diurno/Noturno: Stanley Gonsalvez Diurno/Noturno: 71999033305", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Imbituba", uf: "SC", sigla: "IMA", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Cleideson Freitas Diurno/Noturno: (48) 99141-1588", coordenador: "Diruno/Noturno RAFAEL VARGAS Diurno/Noturno: 48 99178-9367", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Imperatriz", uf: "MA", sigla: "ITZ", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Jose Maia de Oliveira / Noturno: Jose Maia de Oliveira Diurno: (98) 986068643 / Noturno: (98) 986068643", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Inhumas", uf: "GO", sigla: "IUS", fila: "PLANTA EXTERNA N1 / GO 3", eps: "ABILITY", status: "SIGO", primeiroContato: "", supervisor: "Diurno:  / Noturno: Uraci Diurno:  / Noturno: 11 94459-4514", coordenador: "Diurno:  / Noturno: Cleiton Neves Diurno:  / Noturno: 11 99820-3955", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Itaberaí", uf: "GO", sigla: "IEI", fila: "PLANTA EXTERNA N1 / GO 3", eps: "ABILITY", status: "SIGO", primeiroContato: "", supervisor: "Diurno:  / Noturno: Uraci Diurno:  / Noturno: 11 94459-4514", coordenador: "Diurno:  / Noturno: Cleiton Neves Diurno:  / Noturno: 11 99820-3955", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Itabuna", uf: "BA", sigla: "ITB", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Thiado Matos / Noturno: Ricardo Diurno: 73 99852-4467 / Noturno: 7199742-2205", coordenador: "Diurno/Noturno: Stanley Gonsalvez Diurno/Noturno: 71999033305", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Itaperuna", uf: "RJ", sigla: "IRA", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Itumbiara", uf: "GO", sigla: "IUB", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "NÃO SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Wilmon da Silva Guimaraes Neto / Noturno: Wilmon da Silva Guimaraes Neto Diurno: 62 9691-4052 / Noturno: 62 9691-4052", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Ivotí", uf: "RS", sigla: "IVI", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Jaraguá", uf: "GO", sigla: "JRG", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Wilmon da Silva Guimaraes Neto / Noturno: Wilmon da Silva Guimaraes Neto Diurno: 62 9691-4052 / Noturno: 62 9691-4052", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Jataí", uf: "GO", sigla: "JTI", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Wilmon da Silva Guimaraes Neto / Noturno: Wilmon da Silva Guimaraes Neto Diurno: 62 9691-4052 / Noturno: 62 9691-4052", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Jequié", uf: "BA", sigla: "JEE", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Thiado Matos / Noturno: Ricardo Diurno: 73 99852-4467 / Noturno: 7199742-2205", coordenador: "Diurno: Ramon ger campo / Noturno: Ramon ger campo Diurno/Noturno: 71999033305", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Ji-Paraná", uf: "RO", sigla: "JIP", fila: "PLANTA EXTERNA N1 / RO", eps: "ABILITY", status: "SIGO", primeiroContato: "", supervisor: "Diurno:  / Noturno: Uraci Diurno:  / Noturno: 11 94459-4514", coordenador: "Diurno:  / Noturno: Cleiton Neves Diurno:  / Noturno: 11 99820-3955", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Juazeiro Do Norte", uf: "CE", sigla: "JNE", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", primeiroContato: "Diurno/Noturno: Joao Portugal: (71) 98460-8868", supervisor: "Diurno: Ricardo Alexandre / Noturno: Nelson Barroso Campo Diurno: 71 99742-2205 / Noturno: 88 98164-1839", coordenador: "Diurno/ Noturno: Marcilio Cassiano Sup Campo 85 99411-9484", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Lagarto", uf: "SE", sigla: "LAT", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Thiado Matos / Noturno: Ricardo Diurno: 73 99852-4467 / Noturno: 7199742-2205", coordenador: "Diurno/Noturno: Stanley Gonsalvez Diurno/Noturno: 71999033305", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Lagoa Vermelha", uf: "RS", sigla: "LVH", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Lajeado", uf: "RS", sigla: "LJO", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Lucas Do Rio Verde", uf: "MT", sigla: "LRV", fila: "PLANTA EXTERNA N1 / MT 1", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Mauricio  Souza / Noturno: Diurno: 67 9805-7675 / Noturno: 67 9805-7675", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Luís Eduardo Magalhães", uf: "BA", sigla: "MIOO", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Thiado Matos / Noturno: Ricardo Diurno: 73 99852-4467 / Noturno: 7199742-2205", coordenador: "Diurno/Noturno: Stanley Gonsalvez Diurno/Noturno: 71999033305", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Macapá", uf: "AP", sigla: "MPA", fila: "PLANTA EXTERNA N1 / AP", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Clodomir Pinheiro / Noturno: Clodomir Pinheiro Diurno: 92 99427-4169 / Noturno: 92 99427-4169", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Mafra", uf: "SC", sigla: "MFA", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno/Noturno: 48 99104-6957", coordenador: "Diurno/Noturno: Joanir Taques Diurno/Noturno: 47 99245-9288", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Manaus", uf: "AM", sigla: "MNS", fila: "PLANTA EXTERNA N1 / AM", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Clodomir Pinheiro / Noturno: Clodomir Pinheiro Diurno: 92 99427-4169 / Noturno: 92 99427-4169", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Mangaratiba", uf: "RJ", sigla: "MGB", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Mineiros", uf: "GO", sigla: "MNI", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Wilmon da Silva Guimaraes Neto / Noturno: Wilmon da Silva Guimaraes Neto Diurno: 62 9691-4052 / Noturno: 62 9691-4052", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Morrinhos", uf: "GO", sigla: "MIH", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "NÃO SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Wilmon da Silva Guimaraes Neto / Noturno: Wilmon da Silva Guimaraes Neto Diurno: 62 9691-4052 / Noturno: 62 9691-4052", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Mossoró", uf: "RN", sigla: "MRO", fila: "PLANTA EXTERNA N1 / RN", eps: "TECNOMULTI", status: "SIGO", primeiroContato: "Mikaelle Silva De Oliveira/Giselle Esmeralda Do Prado/Vinicius Santos De Lucena/Allana Bernardo Dantas De Araujo/Fatima Maria Agripino Dos Reis/Abimael Anibal Vieira Filho (84) 98661-0163 / (81) 99256-9899 / (81) 98584-4552 / (84) 98749-6846 / (81) 98735-4262 / (81) 99119-5622", supervisor: "Diurno/Noturno: Vinicius Lucena Diurno/Noturno: (86) 99828-0083", coordenador: "Mihael Jakson Diurno/Noturno: (84) 98635-8332", gerente: "Diurno/Noturno: João Paulo Diurno/Noturno: (81) 98584-2246" },
+        { municipio: "Navegantes", uf: "SC", sigla: "NVG", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: William Kruger Diurno/Noturno: 48 99159-5598", coordenador: "Diurno/Noturno: Joanir Taques Diurno/Noturno: 47 99245-9288", gerente: "Diurno/Noturno: Gerente Gelson Diurno/Noturno: 48991318410" },
+        { municipio: "Nova Friburgo", uf: "RJ", sigla: "NOF", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Nova Lima", uf: "MG", sigla: "NLA", fila: "PLANTA EXTERNA N1 / MG 5", eps: "TELEMONT", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Ac-acio Diurno/Noturno: (35) 99757-9489", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno: (31) 98492-6662", gerente: "Diurno/Noturno: (41) 992656324" },
+        { municipio: "Nova Mutum", uf: "MT", sigla: "NMM", fila: "PLANTA EXTERNA N1 / MT 1", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Mauricio  Souza / Noturno: Diurno: 67 9805-7675 / Noturno: 67 9805-7675", gerente: "Diurno: Jander / Noturno: Jander Diurno: 67 9895-5452 / Noturno: 67 9895-5452" },
+        { municipio: "Nova Petrópolis", uf: "RS", sigla: "NVP", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Osório", uf: "RS", sigla: "OSR", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Paço Do Lumiar", uf: "MA", sigla: "PCL", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Jose Maia de Oliveira / Noturno: Jose Maia de Oliveira Diurno: (98) 986068643 / Noturno: (98) 986068643", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Palmas", uf: "TO", sigla: "PMJ", fila: "PLANTA EXTERNA N1 / TO", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Juliano Henrique Prestes / Noturno: Juliano Henrique Prestes Diurno: 11 91760-5917 / Noturno: 11 91760-5917", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Palmeira Das Missões", uf: "RS", sigla: "PMM", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Paragominas", uf: "PA", sigla: "PGN", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Jefferson Sombra / Noturno: Jefferson Sombra Diurno: 91 99373-8853 / Noturno: 91 99373-8853", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Paraty", uf: "RJ", sigla: "PAT", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Parauapebas", uf: "PA", sigla: "PUP", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Jefferson Sombra / Noturno: Jefferson Sombra Diurno: 91 99373-8853 / Noturno: 91 99373-8853", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Parnaíba", uf: "PI", sigla: "PNA", fila: "PLANTA EXTERNA N1 / PI", eps: "R2", status: "SIGO", primeiroContato: "Diurno/Noturno: Caio Menezes (71) 99607-0561", supervisor: "Diurno: Jefferson sup campo / Noturno: Nelson Barroso Campo Diurno: 89 98122-2467 / Noturno: 88 98164-1839", coordenador: "Diurno: Jefferson sup campo / Noturno: Nelson sup campo Diurno: 89 98122-2467 / Noturno: 88 98164-1839", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Parnamirim", uf: "RN", sigla: "PWM", fila: "PLANTA EXTERNA N1 / RN", eps: "TECNOMULTI", status: "SIGO", primeiroContato: "Mikaelle Silva De Oliveira/Giselle Esmeralda Do Prado/Vinicius Santos De Lucena/Allana Bernardo Dantas De Araujo/Fatima Maria Agripino Dos Reis/Abimael Anibal Vieira Filho (84) 98661-0163 / (81) 99256-9899 / (81) 98584-4552 / (84) 98749-6846 / (81) 98735-4262 / (81) 99119-5622", supervisor: "Diurno/Noturno: Vinicius Lucena Diurno/Noturno: (86) 99828-0083", coordenador: "Joã Paulo Diurno/Noturno: (81) 98584-2264", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Patos", uf: "PB", sigla: "POS", fila: "PLANTA EXTERNA N1 / PB", eps: "TECNOMULTI", status: "SIGO", primeiroContato: "Mikaelle Silva De Oliveira/Giselle Esmeralda Do Prado/Vinicius Santos De Lucena/Allana Bernardo Dantas De Araujo/Fatima Maria Agripino Dos Reis/Abimael Anibal Vieira Filho (84) 98661-0163 / (81) 99256-9899 / (81) 98584-4552 / (84) 98749-6846 / (81) 98735-4262 / (81) 99119-5622", supervisor: "Diurno/Noturno: Vinicius Lucena Diurno/Noturno: (86) 99828-0083", coordenador: "Joã Paulo Diurno/Noturno: (81) 98584-2264", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Petrolina", uf: "PE", sigla: "PTA", fila: "PLANTA EXTERNA N1 / PE 1", eps: "R2", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Thiado Matos / Noturno: Ricardo Diurno: 73 99852-4467 / Noturno: 7199742-2205", coordenador: "Diurno/Noturno: Stanley Gonsalvez Diurno/Noturno: 71999033305", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Petrópolis", uf: "RJ", sigla: "PTS", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Picos", uf: "PI", sigla: "PCZ", fila: "PLANTA EXTERNA N1 / PI 2", eps: "VIRTEX", status: "SIGO", primeiroContato: "Italo Nogueira De Sousa Carvalho (87) 99949-4033", supervisor: "Diurno/Noturno: Leonardo Ribeiro da Cruz Diurno/Noturno: 89 99428-2786", coordenador: "Diurno/Noturno: Tarcivando Oliveira 89 99405-9197", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Poços De Caldas", uf: "MG", sigla: "PCS", fila: "PLANTA EXTERNA N1 / MG 4", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Ac-acio Diurno/Noturno: (35) 99757-9489", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno: (31) 98492-6662", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: (41) 992656324" },
+        { municipio: "Pomerode", uf: "SC", sigla: "POD", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: William Kruger Diurno/Noturno: 48 99159-5598", coordenador: "Diurno/Noturno: Joanir Taques Diurno/Noturno: 47 99245-9288", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Porto Seguro", uf: "BA", sigla: "PGU", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Thiado Matos / Noturno: Ricardo Diurno: 73 99852-4467 / Noturno: 7199742-2205", coordenador: "Diurno/Noturno: Stanley Gonsalvez Diurno/Noturno: 71999033305", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Pouso Alegre", uf: "MG", sigla: "PSA", fila: "PLANTA EXTERNA N1 / MG 4", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Ac-acio Diurno/Noturno: (35) 99757-9489", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno: (31) 98492-6662", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: (41) 992656324" },
+        { municipio: "Primavera Do Leste", uf: "MT", sigla: "PVT", fila: "PLANTA EXTERNA N1 / MT  2", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Mauricio  Souza / Noturno: Diurno: 67 9805-7675 / Noturno: 67 9805-7675", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Redenção", uf: "PA", sigla: "RDO", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Jefferson Sombra / Noturno: Jefferson Sombra Diurno: 91 99373-8853 / Noturno: 91 99373-8853", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Resende", uf: "RJ", sigla: "RSD", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Ribeirão Das Neves", uf: "MG", sigla: "RNS", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Ac-acio Diurno/Noturno: (35) 99757-9489", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno: (31) 98492-6662", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: (41) 992656324" },
+        { municipio: "Rio Bonito", uf: "RJ", sigla: "RBT", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Rio Das Ostras", uf: "RJ", sigla: "RIOS", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Rio Do Sul", uf: "SC", sigla: "RSL", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: William Kruger Diurno/Noturno: 48 99159-5598", coordenador: "Diurno/Noturno: Joanir Taques Diurno/Noturno: 47 99245-9288", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Santa Inês", uf: "MA", sigla: "SIS", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Jose Maia de Oliveira / Noturno: Jose Maia de Oliveira Diurno: (98) 986068643 / Noturno: (98) 986068643", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Santa Luzia", uf: "MG", sigla: "SLU", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Ac-acio Diurno/Noturno: (35) 99757-9489", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno: (31) 98492-6662", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: (41) 992656324" },
+        { municipio: "Santa Maria De Jetibá", uf: "ES", sigla: "SMJ", fila: "PLANTA EXTERNA N1 / ES", eps: "Hallen", status: "SIGO", primeiroContato: "", supervisor: "Rogério Sobreira 27 98109-1998", coordenador: "Claudio 27 98107-1871", gerente: "Perin 27 99940-3632" },
+        { municipio: "Santa Rosa", uf: "RS", sigla: "SRO", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", status: "NÃO SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Sant'Ana Do Livramento", uf: "RS", sigla: "SIV", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Santo Ângelo", uf: "RS", sigla: "SAN", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", status: "NÃO SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Santo Antônio De Jesus", uf: "BA", sigla: "SNJ", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Thiado Matos / Noturno: Ricardo Diurno: 73 99852-4467 / Noturno: 7199742-2205", coordenador: "Diurno/Noturno: Stanley Gonsalvez Diurno/Noturno: 71999033305", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "São Bento Do Sul", uf: "SC", sigla: "SBS", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno/Noturno: 48 99104-6957", coordenador: "Diurno/Noturno: Joanir Taques Diurno/Noturno: 47 99245-9288", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "São José De Ribamar", uf: "MA", sigla: "SJE", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Jose Maia de Oliveira / Noturno: Jose Maia de Oliveira Diurno: (98) 986068643 / Noturno: (98) 986068643", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "São Luís", uf: "MA", sigla: "SLS", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Jose Maia de Oliveira / Noturno: Jose Maia de Oliveira Diurno: (98) 986068643 / Noturno: (98) 986068643", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "São Marcos", uf: "RS", sigla: "SCS", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "São Mateus", uf: "ES", sigla: "SMT", fila: "PLANTA EXTERNA N1 / ES", eps: "Hallen", status: "NÃO SIGO", primeiroContato: "", supervisor: "Rogério Sobreira 27 98109-1998", coordenador: "Claudio 27 98107-1871", gerente: "Perin 27 99940-3632" },
+        { municipio: "São Pedro Da Aldeia", uf: "RJ", sigla: "SPA", fila: "PLANTA EXTERNA N1/RJ 1", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Sarandi", uf: "RS", sigla: "SRD", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Sete Lagoas", uf: "MG", sigla: "SLA", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Ac-acio Diurno/Noturno: (35) 99757-9489", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno: (31) 98492-6662", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: (41) 992656324" },
+        { municipio: "Sinop", uf: "MT", sigla: "SNO", fila: "PLANTA EXTERNA N1 / MT 2", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Mauricio  Souza / Noturno: Diurno: 67 9805-7675 / Noturno: 67 9805-7675", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Sobral", uf: "CE", sigla: "SOL", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", primeiroContato: "Ana Kezia (71) 99667-9100", supervisor: "Diurno: Ricardo Alexandre / Noturno: Nelson Barroso Campo Diurno: 71 99742-2205 / Noturno: 88 98164-1839", coordenador: "Diurno/ Noturno: Marcilio Cassiano Sup Campo 85 99411-9484", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Sorriso", uf: "MT", sigla: "SSZ", fila: "PLANTA EXTERNA N1 / MT 1", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Mauricio  Souza / Noturno: Diurno: 67 9805-7675 / Noturno: 67 9805-7675", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Tangará Da Serra", uf: "MT", sigla: "TGS", fila: "PLANTA EXTERNA N1 / MT  2", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Mauricio  Souza / Noturno: Diurno: 67 9805-7675 / Noturno: 67 9805-7675", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Taquara", uf: "RS", sigla: "TQR", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Teixeira De Freitas", uf: "BA", sigla: "TAF", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Thiado Matos / Noturno: Ricardo Diurno: 73 99852-4467 / Noturno: 7199742-2205", coordenador: "Diurno/Noturno: Stanley Gonsalvez Diurno/Noturno: 71999033305", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Teresina", uf: "PI", sigla: "TSA", fila: "PLANTA EXTERNA N1 / PI 2", eps: "VIRTEX", status: "SIGO", primeiroContato: "Diego Tiago Da Silva (89) 98136-9930", supervisor: "Diurno/Noturno: Leonardo Ribeiro da Cruz Diurno/Noturno: 89 99428-2786", coordenador: "Diurno/Noturno: Tarcivando Oliveira 89 99405-9197", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Teresópolis", uf: "RJ", sigla: "TRL", fila: "PLANTA EXTERNA N1/RJ 1", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Teutônia", uf: "RS", sigla: "TUN", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Timóteo", uf: "MG", sigla: "TTO", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Ac-acio Diurno/Noturno: (35) 99757-9489", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno: (31) 98492-6662", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: (41) 992656324" },
+        { municipio: "Torres", uf: "RS", sigla: "TES", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Tramandaí", uf: "RS", sigla: "TRI", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Trancoso", uf: "BA", sigla: "TCOS", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Thiado Matos / Noturno: Ricardo Diurno: 73 99852-4467 / Noturno: 7199742-2205", coordenador: "Diurno/Noturno: Stanley Gonsalvez Diurno/Noturno: 71999033305", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Três Corações", uf: "MG", sigla: "TCS", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Ac-acio Diurno/Noturno: (35) 99757-9489", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno: (31) 98492-6662", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: (41) 992656324" },
+        { municipio: "Três De Maio", uf: "RS", sigla: "TMI", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", status: "NÃO SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Três Lagoas", uf: "MS", sigla: "TLS", fila: "PLANTA EXTERNA N1 / MS", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Juliano Henrique Prestes / Noturno: Juliano Henrique Prestes Diurno: 91760-5917 / Noturno: 91760-5917", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Três Pontas", uf: "MG", sigla: "TPS", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "NÃO SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Ac-acio Diurno/Noturno: (35) 99757-9489", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno: (31) 98492-6662", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: (41) 992656324" },
+        { municipio: "Três Rios", uf: "RJ", sigla: "TRS", fila: "PLANTA EXTERNA N1/RJ 1", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Tucuruí", uf: "PA", sigla: "TUU", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Jefferson Sombra / Noturno: Jefferson Sombra Diurno: 91 99373-8853 / Noturno: 91 99373-8853", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Uberaba", uf: "MG", sigla: "URA", fila: "PLANTA EXTERNA N1 / MG 1", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Ubiratan / Noturno: Cleverson Diurno: (34)998401248 / Noturno: (62) 996236940", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Uberlândia", uf: "MG", sigla: "ULA", fila: "PLANTA EXTERNA N1 / MG 1", eps: "ONDACOM", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Raquel / Noturno: Carla Diurno: 11 93442-3255 / Noturno: 11 91257-5972", coordenador: "Diurno: Ubiratan / Noturno: Cleverson Diurno: (34)998401248 / Noturno: (62) 996236940", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Uruguaiana", uf: "RS", sigla: "UGN", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Vacaria", uf: "RS", sigla: "VAA", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Valença", uf: "RJ", sigla: "VLC", fila: "PLANTA EXTERNA N1/RJ 1", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Varginha", uf: "MG", sigla: "VGA", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "NÃO SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Ac-acio Diurno/Noturno: (35) 99757-9489", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno: (31) 98492-6662", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: (41) 992656324" },
+        { municipio: "Venâncio Aires", uf: "RS", sigla: "VAI", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Veranópolis", uf: "RS", sigla: "VNS", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Viana", uf: "ES", sigla: "VIA", fila: "PLANTA EXTERNA N1 / ES", eps: "Hallen", status: "SIGO", primeiroContato: "", supervisor: "Rogério Sobreira 27 98109-1998", coordenador: "Claudio 27 98107-1871", gerente: "Perin 27 99940-3632" },
+        { municipio: "Vitória Da Conquista", uf: "BA", sigla: "VCA", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", primeiroContato: "", supervisor: "Diurno: Thiado Matos / Noturno: Ricardo Diurno: 73 99852-4467 / Noturno: 7199742-2205", coordenador: "Diurno/Noturno: Stanley Gonsalvez Diurno/Noturno: 71999033305", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" },
+        { municipio: "Volta Redonda", uf: "RJ", sigla: "VRD", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE", status: "SIGO", primeiroContato: "", supervisor: "Diurno: LILIAM /Noturno: Sup campo WELLINGTON Diurno: 41 998023700 /Noturno: (24) 99932-1020", coordenador: "Diurno/Noturno: Rodrigo Palvas Diurno/Noturno:(31) 984926662", gerente: "Diurno/ Noturno: Gerente Leandro Lucina Diurno/Noturno: (41) 992656324" },
+        { municipio: "Xangri-Lá", uf: "RS", sigla: "XNLA", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", status: "SIGO", primeiroContato: "", supervisor: "Diurno/Noturno: Leonardo Hauch Diurno/Noturno: 55 99989-2154", coordenador: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120", gerente: "Diurno/ Noturno: Gerente senior Jeferson Diurno/Noturno: 54 98429 2120" }
+    ];
 
-    const baseDadosFibra = [
-        { municipio: "Arapiraca", uf: "AL", sigla: "AIR", fila: "PLANTA EXTERNA N1 / AL", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Manaus", uf: "AM", sigla: "MNS", fila: "PLANTA EXTERNA N1 / AM", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Júlio Nascimento (92) 99310-9714" },
-        { municipio: "Macapa", uf: "AP", sigla: "MPA", fila: "PLANTA EXTERNA N1 / AP", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Paulo Teixeira (42) 99162-4090" },
-        { municipio: "Arraial D'Ajuda", uf: "BA", sigla: "ALDA", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Barreiras", uf: "BA", sigla: "BES", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Eunapolis", uf: "BA", sigla: "EUS", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Guanambi", uf: "BA", sigla: "GNB", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Ilheus", uf: "BA", sigla: "ILH", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Itabuna", uf: "BA", sigla: "ITB", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Jequie", uf: "BA", sigla: "JEE", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Lagarto", uf: "SE", sigla: "LAT", fila: "PLANTA EXTERNA N1 / SE", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Luis Eduardo Magalhaes", uf: "BA", sigla: "MIOO", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Porto Seguro", uf: "BA", sigla: "PGU", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Santo Antonio de Jesus", uf: "BA", sigla: "SNJ", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Teixeira de Freitas", uf: "BA", sigla: "TAF", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Trancoso", uf: "BA", sigla: "TCOS", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Vitoria da Conquista", uf: "BA", sigla: "VCA", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Crato", uf: "CE", sigla: "CTO", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Douglas Mata (86) 98106-6049" },
-        { municipio: "Juazeiro do Norte", uf: "CE", sigla: "JNE", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Douglas Mata (86) 98106-6049" },
-        { municipio: "Sobral", uf: "CE", sigla: "SOL", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Douglas Mata (86) 98106-6049" },
-        { municipio: "Cachoeiro de Itapemirim", uf: "ES", sigla: "CIM", fila: "PLANTA EXTERNA N1 / ES", eps: "FIBRASIL", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Fabiano Martelete (11) 97492-1488" },
-        { municipio: "Guarapari", uf: "ES", sigla: "GRI", fila: "PLANTA EXTERNA N1 / ES", eps: "FIBRASIL", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Fabiano Martelete (11) 97492-1488" },
-        { municipio: "Santa Maria de Jetiba", uf: "ES", sigla: "SMJ", fila: "PLANTA EXTERNA N1 / ES", eps: "FIBRASIL", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Fabiano Martelete (11) 97492-1488" },
-        { municipio: "Viana", uf: "ES", sigla: "VIA", fila: "PLANTA EXTERNA N1 / ES", eps: "FIBRASIL", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Fabiano Martelete (11) 97492-1488" },
-        { municipio: "Aracruz", uf: "ES", sigla: "ACZ", fila: "PLANTA EXTERNA N1 / ES", eps: "FIBRASIL", status: "SAGRE", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Fabiano Martelete (11) 97492-1488" },
-        { municipio: "Sao Mateus", uf: "ES", sigla: "SMT", fila: "PLANTA EXTERNA N1 / ES", eps: "FIBRASIL", status: "SAGRE", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Fabiano Martelete (11) 97492-1488" },
-        { municipio: "Jaragua", uf: "GO", sigla: "JRG", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Jatai", uf: "GO", sigla: "JTI", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Mineiros", uf: "GO", sigla: "MNI", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Caldas Novas", uf: "GO", sigla: "CLV", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "SAGRE", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Catalao", uf: "GO", sigla: "CTL", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "SAGRE", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Itumbiara", uf: "GO", sigla: "IUB", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "SAGRE", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Morrinhos", uf: "GO", sigla: "MIH", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", status: "SAGRE", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Formosa", uf: "GO", sigla: "FRM", fila: "PLANTA EXTERNA N1 / GO 3", eps: "ABILITY", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Itaberai", uf: "GO", sigla: "IEI", fila: "PLANTA EXTERNA N1 / GO 3", eps: "ABILITY", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Inhumas", uf: "GO", sigla: "IUS", fila: "PLANTA EXTERNA N1 / GO 3", eps: "ABILITY", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Acailandia", uf: "MA", sigla: "ACD", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Tiago Araújo (11) 93448-3914" },
-        { municipio: "Balsas", uf: "MA", sigla: "BLA", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Tiago Araújo (11) 93448-3914" },
-        { municipio: "Imperatriz", uf: "MA", sigla: "ITZ", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Tiago Araújo (11) 93448-3914" },
-        { municipio: "Paco do Lumiar", uf: "MA", sigla: "PCL", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Tiago Araújo (11) 93448-3914" },
-        { municipio: "Santa Ines", uf: "MA", sigla: "SIS", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Tiago Araújo (11) 93448-3914" },
-        { municipio: "Sao Jose de Ribamar", uf: "SJE", sigla: "SJE", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Tiago Araújo (11) 93448-3914" },
-        { municipio: "Sao Luis", uf: "MA", sigla: "SLS", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Tiago Araújo (11) 93448-3914" },
-        { municipio: "Uberlandia", uf: "MG", sigla: "ULA", fila: "PLANTA EXTERNA N1 / MG 1", eps: "ONDACOM", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Eufran Freitas (31) 97595-2474" },
-        { municipio: "Uberaba", uf: "MG", sigla: "URA", fila: "PLANTA EXTERNA N1 / MG 1", eps: "ONDACOM", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Eufran Freitas (31) 97595-2474" },
-        { municipio: "Ibirite", uf: "MG", sigla: "IIE", fila: "PLANTA EXTERNA N1 / MG 2", eps: "ONDACOM", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Eufran Freitas (31) 97595-2474" },
-        { municipio: "Divinopolis", uf: "MG", sigla: "DVL", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Alessandro Moreira (11) 94212-4957" },
-        { municipio: "Ribeirao das Neves", uf: "MG", sigla: "RNS", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Eufran Freitas (31) 97595-2474" },
-        { municipio: "Sete Lagoas", uf: "MG", sigla: "SLA", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Eufran Freitas (31) 97595-2474" },
-        { municipio: "Santa Luzia", uf: "MG", sigla: "SLU", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Eufran Freitas (31) 97595-2474" },
-        { municipio: "Tres Coracoes", uf: "MG", sigla: "TCS", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Alessandro Moreira (11) 94212-4957" },
-        { municipio: "Timoteo", uf: "MG", sigla: "TTO", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Eufran Freitas (31) 97595-2474" },
-        { municipio: "Tres Pontas", uf: "MG", sigla: "TPS", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SAGRE", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Alessandro Moreira (11) 94212-4957" },
-        { municipio: "Varginha", uf: "MG", sigla: "VGA", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", status: "SAGRE", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Alessandro Moreira (11) 94212-4957" },
-        { municipio: "Pocos de Caldas", uf: "MG", sigla: "PCS", fila: "PLANTA EXTERNA N1 / MG 4", eps: "RADIANTE", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Alessandro Moreira (11) 94212-4957" },
-        { municipio: "Pouso Alegre", uf: "MG", sigla: "PSA", fila: "PLANTA EXTERNA N1 / MG 4", eps: "RADIANTE", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Alessandro Moreira (11) 94212-4957" },
-        { municipio: "Nova Lima", uf: "MG", sigla: "NLA", fila: "PLANTA EXTERNA N1 / MG 5", eps: "RADIANTE", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Eufran Freitas (31) 97595-2474" },
-        { municipio: "Tres Lagoas", uf: "MS", sigla: "TLS", fila: "PLANTA EXTERNA N1 / MS", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Adonielson Jordão (11) 91670-7054" },
-        { municipio: "Campo Verde", uf: "MT", sigla: "CZV", fila: "PLANTA EXTERNA N1 / MT 2", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Adonielson Jordão (11) 91670-7054" },
-        { municipio: "Primavera do Leste", uf: "MT", sigla: "PVT", fila: "PLANTA EXTERNA N1 / MT 2", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Adonielson Jordão (11) 91670-7054" },
-        { municipio: "Tangara da Serra", uf: "MT", sigla: "TGS", fila: "PLANTA EXTERNA N1 / MT 2", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Adonielson Jordão (11) 91670-7054" },
-        { municipio: "Lucas do Rio Verde", uf: "MT", sigla: "LRV", fila: "PLANTA EXTERNA N1 / MT 1", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Adonielson Jordão (11) 91670-7054" },
-        { municipio: "Nova Mutum", uf: "MT", sigla: "NMM", fila: "PLANTA EXTERNA N1 / MT 1", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Adonielson Jordão (11) 91670-7054" },
-        { municipio: "Sorriso", uf: "MT", sigla: "SSZ", fila: "PLANTA EXTERNA N1 / MT 1", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Adonielson Jordão (11) 91670-7054" },
-        { municipio: "Sinop", uf: "MT", sigla: "SNO", fila: "PLANTA EXTERNA N1 / MT 2", eps: "ONDACOM", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Adonielson Jordão (11) 91670-7054" },
-        { municipio: "Altamira", uf: "PA", sigla: "ATM", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Bruno Ayres (91) 98027-1952" },
-        { municipio: "Belem", uf: "PA", sigla: "BLM", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Bruno Ayres (91) 98027-1952" },
-        { municipio: "Castanhal", uf: "PA", sigla: "CAH", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Bruno Ayres (91) 98027-1952" },
-        { municipio: "Canaa dos Carajas", uf: "PA", sigla: "CKJ", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Bruno Ayres (91) 98027-1952" },
-        { municipio: "Capanema", uf: "PA", sigla: "CPN", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Bruno Ayres (91) 98027-1952" },
-        { municipio: "Paragominas", uf: "PA", sigla: "PGN", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Bruno Ayres (91) 98027-1952" },
-        { municipio: "Parauapebas", uf: "PA", sigla: "PUP", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Bruno Ayres (91) 98027-1952" },
-        { municipio: "Redencao", uf: "PA", sigla: "RDO", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Bruno Ayres (91) 98027-1952" },
-        { municipio: "Tucurui", uf: "PA", sigla: "TUU", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Bruno Ayres (91) 98027-1952" },
-        { municipio: "Cabedelo", uf: "PB", sigla: "CBD", fila: "PLANTA EXTERNA N1 / PB", eps: "TECNOMULTI", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Samuel Costa (11) 94323-7772" },
-        { municipio: "Patos", uf: "PB", sigla: "POS", fila: "PLANTA EXTERNA N1 / PB", eps: "TECNOMULTI", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Samuel Costa (11) 94323-7772" },
-        { municipio: "Petrolina", uf: "PE", sigla: "PTA", fila: "PLANTA EXTERNA N1 / PE 1", eps: "R2", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Garanhuns", uf: "PE", sigla: "GUS", fila: "PLANTA EXTERNA N1 / PE 2", eps: "TECNOMULTI", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Samuel Costa (11) 94323-7772" },
-        { municipio: "Parnaiba", uf: "PI", sigla: "PNA", fila: "PLANTA EXTERNA N1 / PI", eps: "R2", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Douglas Mata (86) 98106-6049" },
-        { municipio: "Picos", uf: "PI", sigla: "PCZ", fila: "PLANTA EXTERNA N1 / PI 2", eps: "VIRTEX", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Douglas Mata (86) 98106-6049" },
-        { municipio: "Teresina", uf: "PI", sigla: "TSA", fila: "PLANTA EXTERNA N1 / PI 2", eps: "VIRTEX", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Douglas Mata (86) 98106-6049" },
-        { municipio: "Araruama", uf: "RJ", sigla: "AMA", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-        { municipio: "Armacao dos Buzios", uf: "RJ", sigla: "ARBU", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-        { municipio: "Cabo Frio", uf: "RJ", sigla: "CBF", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-        { municipio: "Iguaba Grande", uf: "RJ", sigla: "IGGR", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-        { municipio: "Itaperuna", uf: "RJ", sigla: "IRA", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-        { municipio: "Petropolis", uf: "RJ", sigla: "PTS", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-        { municipio: "Rio Bonito", uf: "RJ", sigla: "RBT", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-        { municipio: "Rio das Ostras", uf: "RJ", sigla: "RIOS", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-        { municipio: "Angra dos Reis", uf: "RJ", sigla: "ARS", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Jesus Pedruzi (21) 97260-9581" },
-        { municipio: "Barra Mansa", uf: "RJ", sigla: "BMA", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Jesus Pedruzi (21) 97260-9581" },
-        { municipio: "Barra do Pirai", uf: "RJ", sigla: "BPI", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Jesus Pedruzi (21) 97260-9581" },
-        { municipio: "Mangaratiba", uf: "RJ", sigla: "MGB", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Jesus Pedruzi (21) 97260-9581" },
-        { municipio: "Nova Friburgo", uf: "RJ", sigla: "NOF", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-        { municipio: "Paraty", uf: "RJ", sigla: "PAT", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Jesus Pedruzi (21) 97260-9581" },
-        { municipio: "Resende", uf: "RJ", sigla: "RSD", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Jesus Pedruzi (21) 97260-9581" },
-        { municipio: "Volta Redonda", uf: "RJ", sigla: "VRD", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Jesus Pedruzi (21) 97260-9581" },
-        { municipio: "Mossoro", uf: "RN", sigla: "MRO", fila: "PLANTA EXTERNA N1 / RN", eps: "TECNOMULTI", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Samuel Costa (11) 94323-7772" },
-        { municipio: "Parnamirim", uf: "RN", sigla: "PWM", fila: "PLANTA EXTERNA N1 / RN", eps: "TECNOMULTI", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Samuel Costa (11) 94323-7772" },
-        { municipio: "Ji-Parana", uf: "RO", sigla: "JIP", fila: "PLANTA EXTERNA N1 / RO", eps: "ABILITY", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Denilson Tragante (11) 94145-1175" },
-        { municipio: "Carlos Barbosa", uf: "RS", sigla: "CLB", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Dois Irmaos", uf: "RS", sigla: "DSR", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Erechim", uf: "RS", sigla: "ERE", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Flores da Cunha", uf: "RS", sigla: "FCA", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Garibaldi", uf: "RS", sigla: "GRD", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Ivoti", uf: "RS", sigla: "IVI", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Capao da Canoa", uf: "RS", sigla: "KDK", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Nova Petropolis", uf: "RS", sigla: "NVP", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Osorio", uf: "RS", sigla: "OSR", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Sao Marcos", uf: "RS", sigla: "SCS", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Torres", uf: "RS", sigla: "TES", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Taquara", uf: "RS", sigla: "TQR", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Tramandai", uf: "RS", sigla: "TRI", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Veranopolis", uf: "RS", sigla: "VNS", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Xangri-la", uf: "RS", sigla: "XNLA", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Santa Rosa", uf: "RS", sigla: "SRO", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SAGRE", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Santo Angelo", uf: "RS", sigla: "SAN", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SAGRE", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Tres de Maio", uf: "RS", sigla: "TMI", fila: "PLANTA EXTERNA N1 / RS 1", eps: "RAZAOINFO", status: "SAGRE", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Alegrete", uf: "RS", sigla: "ALG", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Bage", uf: "RS", sigla: "BGE", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Camaqua", uf: "RS", sigla: "CAM", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Cachoeira do Sul", uf: "RS", sigla: "CCR", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Canela", uf: "RS", sigla: "CEN", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Carazinho", uf: "RS", sigla: "CIO", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Charqueadas", uf: "RS", sigla: "CQU", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Estrela", uf: "RS", sigla: "ETA", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Gramado", uf: "RS", sigla: "GDO", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Igrejinha", uf: "RS", sigla: "IJH", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Ijui", uf: "RS", sigla: "IJI", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Lajeado", uf: "RS", sigla: "LJO", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Lagoa Vermelha", uf: "RS", sigla: "LVH", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Palmeira das Missoes", uf: "RS", sigla: "PMM", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Sant'Ana do Livramento", uf: "RS", sigla: "SIV", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Sarandi", uf: "RS", sigla: "SRD", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Teutonia", uf: "RS", sigla: "TUN", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Uruguaiana", uf: "RS", sigla: "UGN", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Vacaria", uf: "RS", sigla: "VAA", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Venancio Aires", uf: "RS", sigla: "VAI", fila: "PLANTA EXTERNA N1 / RS 2", eps: "RAZAOINFO", status: "SIGO", coordenador: "Thiago Silveira (43) 99105-3895", supervisor: "Cristiano Viana (54) 99656-9470" },
-        { municipio: "Concordia", uf: "SC", sigla: "CDA", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-        { municipio: "Capinzal", uf: "SC", sigla: "CNZ", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-        { municipio: "Fraiburgo", uf: "SC", sigla: "FGO", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-        { municipio: "Garopaba", uf: "SC", sigla: "GRB", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-        { municipio: "Imbituba", uf: "SC", sigla: "IMA", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-        { municipio: "Mafra", uf: "SC", sigla: "MFA", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-        { municipio: "Navegantes", uf: "SC", sigla: "NVG", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-        { municipio: "Pomerode", uf: "SC", sigla: "POD", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-        { municipio: "Rio do Sul", uf: "SC", sigla: "RSL", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-        { municipio: "Sao Bento do Sul", uf: "SC", sigla: "SBS", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Michael (48) 99100-1328" },
-        { municipio: "Araguaina", uf: "TO", sigla: "ARN", fila: "PLANTA EXTERNA N1 / TO", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Irismar Cardoso (11) 94205-6117" },
-        { municipio: "Palmas", uf: "TO", sigla: "PMJ", fila: "PLANTA EXTERNA N1 / TO", eps: "ONDACOM", status: "SIGO", coordenador: "José do Prado (71) 99980-2017", supervisor: "Irismar Cardoso (11) 94205-6117" },
-        { municipio: "Sao Pedro da Aldeia", uf: "RJ", sigla: "SPA", fila: "PLANTA EXTERNA N1/RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-        { municipio: "Teresopolis", uf: "RJ", sigla: "TRL", fila: "PLANTA EXTERNA N1/RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-        { municipio: "Tres Rios", uf: "RJ", sigla: "TRS", fila: "PLANTA EXTERNA N1/RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Marcelo Pires (11) 94306-9028" },
-        { municipio: "Valenca", uf: "RJ", sigla: "VLC", fila: "PLANTA EXTERNA N1/RJ 1", eps: "RADIANTE RJ", status: "SIGO", coordenador: "Anderson Jean (21) 99742-0520", supervisor: "Jesus Pedruzi (21) 97260-9581" },
-        // Adicionando dados faltantes da VIVO que não estão na Fibrasil para garantir a busca
-        { municipio: "LAURO DE FREITAS", uf: "BA", sigla: "LFS", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "SALVADOR", uf: "BA", sigla: "SDR", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "ARACAJU", uf: "SE", sigla: "AJU", fila: "PLANTA EXTERNA N1 / SE", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "JUAZEIRO", uf: "BA", sigla: "JZO", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "RECIFE", uf: "PE", sigla: "RCF", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "OLINDA", uf: "PE", sigla: "OLN", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "PAULISTA", uf: "PE", sigla: "PAU", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "JABOATAO DOS GUARARAPES", uf: "PE", sigla: "JBG", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "CABO DE SANTO AGOSTINHO", uf: "PE", sigla: "CSA", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "CAMARAGIBE", uf: "PE", sigla: "CGB", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "VITORIA DE SANTO ANTAO", uf: "PE", sigla: "VSA", fila: "PLANTA EXTERNA N1 / PE", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "CAMPINA GRANDE", uf: "PB", sigla: "CPG", fila: "PLANTA EXTERNA N1 / PB", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "JOAO PESSOA", uf: "PB", sigla: "JPA", fila: "PLANTA EXTERNA N1 / PB", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "SANTA RITA", uf: "PB", sigla: "SRI", fila: "PLANTA EXTERNA N1 / PB", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "NATAL", uf: "RN", sigla: "NTL", fila: "PLANTA EXTERNA N1 / RN", eps: "TECNOMULTI", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "FORTALEZA", uf: "CE", sigla: "FOR", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "MARACANAU", uf: "CE", sigla: "MCU", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "CAUCAIA", uf: "CE", sigla: "CAU", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" },
-        { municipio: "TIMON", uf: "MA", sigla: "TIM", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", status: "SIGO", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)" }
-    ];
-    const escalaMG = [
-        { municipio: "DIVINOPOLIS", uf: "MG", coordenador: "Juliano Nunes de Oliveira (31995919305)", supervisor: "Roberto Valeriano de Souza ((31) 97104-0256)", gerente: "Bruno Junqueira Leitao de Almeida (31999102830)" },
-        { municipio: "IBIRITE", uf: "MG", coordenador: "Juliano Nunes de Oliveira (31995919305)", supervisor: "Roberto Valeriano de Souza ((31) 97104-0256)", gerente: "Bruno Junqueira Leitao de Almeida (31999102830)" },
-        { municipio: "SANTA LUZIA", uf: "MG", coordenador: "Juliano Nunes de Oliveira (31995919305)", supervisor: "Roberto Valeriano de Souza ((31) 97104-0256)", gerente: "Bruno Junqueira Leitao de Almeida (31999102830)" },
-        { municipio: "NOVA LIMA", uf: "MG", coordenador: "Juliano Nunes de Oliveira (31995919305)", supervisor: "Jair Rosa de Melo ((31) 99955-7573)", gerente: "Bruno Junqueira Leitao de Almeida (31999102830)" },
-        { municipio: "RIBEIRÃO DA NEVES", uf: "MG", coordenador: "Juliano Nunes de Oliveira (31995919305)", supervisor: "Jair Rosa de Melo ((31) 99955-7573)", gerente: "Bruno Junqueira Leitao de Almeida (31999102830)" },
-        { municipio: "SETE LAGOAS", uf: "MG", coordenador: "Juliano Nunes de Oliveira (31995919305)", supervisor: "Jair Rosa de Melo ((31) 99955-7573)", gerente: "Bruno Junqueira Leitao de Almeida (31999102830)" }
-    ];
-    const escalonamentoCompleto = [
-        ...escalaMG,
-    { municipio: "ILHEUS", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
-    { municipio: "EUNAPOLIS", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
-    { municipio: "ARAPIRACA", uf: "AL", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
-    { municipio: "ARRAIAL D'AJUDA", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
-    { municipio: "BARREIRAS", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
-    { municipio: "GUANAMBI", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
-    { municipio: "ITABUNA", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
-    { municipio: "JEQUIE", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
-    { municipio: "LAGARTO", uf: "SE", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
-    { municipio: "LUIS EDUARDO MAGALHAES", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
-    { municipio: "PORTO SEGURO", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
-    { municipio: "SANTO ANTONIO DE JESUS", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
-    { municipio: "TEIXEIRA DE FREITAS", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
-    { municipio: "TRANCOSO", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
-    { municipio: "VITORIA DA CONQUISTA", uf: "BA", coordenador: "Bruno Leonardo B. Favoreto (41) 991383727)", supervisor: "Denilson Tragante (11 941451175)", gerente: "Cristian Natalino Carvalho (85) 9911-22895)" },
-    { municipio: "JARAGUA", uf: "GO", coordenador: "Alessandro José Lemes (63 9 99914354)", supervisor: "Creone Moreira Souto (62 9 84190813)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
-    { municipio: "JATAI", uf: "GO", coordenador: "Danilo Antonio de Melo (62 9 84706369)", supervisor: "Everton Valim Menezes (64 9 84388830)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
-    { municipio: "ITABERAI", uf: "GO", coordenador: "Daniel Domingos Viana (62 9 84043448)", supervisor: "Alessandro Rezende Da Silva (62 9 84006294)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
-    { municipio: "INHUMAS", uf: "GO", coordenador: "Daniel Domingos Viana (62 9 84043448)", supervisor: "Alessandro Rezende Da Silva (62 9 84006294)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
-    { municipio: "MINEIROS", uf: "GO", coordenador: "Danilo Antonio de Melo (62 9 84706369)", supervisor: "Everton Valim Menezes (64 9 84388830)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
-    { municipio: "MORRINHOS", uf: "GO", coordenador: "Danilo Antonio de Melo (62 9 84706369)", supervisor: "Josiel Alves De Oliveira (62 9 98589604)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
-    { municipio: "CATALÃO", uf: "GO", coordenador: "Danilo Antonio de Melo (62 9 84706369)", supervisor: "Josiel Alves De Oliveira (62 9 98589604)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
-    { municipio: "CALDAS NOVAS", uf: "GO", coordenador: "Danilo Antonio de Melo (62 9 84706369)", supervisor: "Josiel Alves De Oliveira (62 9 98589604)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
-    { municipio: "PALMAS", uf: "TO", coordenador: "Alessandro José Lemes (63 9 99914354)", supervisor: "Ribas Junios Gomes Campelo (63 9 99447319)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
-    { municipio: "PALMAS", uf: "TO", coordenador: "Alessandro José Lemes (63 9 99914354)", supervisor: "Ramohn Caetano Da Silva (63 9 99926212)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
-    { municipio: "ARAGUAÍNA", uf: "TO", coordenador: "Alessandro José Lemes (63 9 99914354)", supervisor: "Ribas Junios Gomes Campelo (63 9 99447319)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
-    { municipio: "ARAGUAÍNA", uf: "TO", coordenador: "Alessandro José Lemes (63 9 99914354)", supervisor: "Ramohn Caetano Da Silva (63 9 99926212)", gerente: "Daniel De Jesus Farias (62 9 99971222)" },
-    { municipio: "TRES LAGOAS", uf: "MS", coordenador: "Joaquim De Morais Silva ((67) 9980-95250)", supervisor: "Anderson Rodrigues Da Silva/ Johnny De Matos ((67) 9963-69476/ (67) 993075445)", gerente: "Gilson Xavier Ferreira ((67) 9923-45090)" },
-    { municipio: "PRIMAVERA DO LESTE", uf: "MT", coordenador: "Vitor Hugo Fabricio Godoy ((67) 99847-6993)", supervisor: "Michael Chabalin Ferraz ((65) 9981-02437)", gerente: "Gilson Xavier Ferreira ((67) 9923-45090)" },
-    { municipio: "TANGARA DA SERRA", uf: "MT", coordenador: "Vitor Hugo Fabricio Godoy ((67) 99847-6993)", supervisor: "Michael Chabalin Ferraz ((65) 9981-02437)", gerente: "Gilson Xavier Ferreira ((67) 9923-45090)" },
-    { municipio: "SINOP", uf: "MT", coordenador: "Vitor Hugo Fabricio Godoy ((67) 99847-6993)", supervisor: "Michael Chabalin Ferraz ((65) 9981-02437)", gerente: "Gilson Xavier Ferreira ((67) 9923-45090)" },
-    { municipio: "LUCAS DO RIO VERDE", uf: "MT", coordenador: "Vitor Hugo Fabricio Godoy ((67) 99847-6993)", supervisor: "Michael Chabalin Ferraz ((65) 9981-02437)", gerente: "Gilson Xavier Ferreira ((67) 9923-45090)" },
-    { municipio: "CAMPO VERDE", uf: "MT", coordenador: "Vitor Hugo Fabricio Godoy ((67) 99847-6993)", supervisor: "Michael Chabalin Ferraz ((65) 9981-02437)", gerente: "Gilson Xavier Ferreira ((67) 9923-45090)" },
-    { municipio: "SORRISO", uf: "MT", coordenador: "Vitor Hugo Fabricio Godoy ((67) 99847-6993)", supervisor: "Michael Chabalin Ferraz ((65) 9981-02437)", gerente: "Gilson Xavier Ferreira ((67) 9923-45090)" },
-    { municipio: "NOVA MUTUM", uf: "MT", coordenador: "Vitor Hugo Fabricio Godoy ((67) 99847-6993)", supervisor: "Michael Chabalin Ferraz ((65) 9981-02437)", gerente: "Gilson Xavier Ferreira ((67) 9923-45090)" },
-    { municipio: "Alegrete", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
-    { municipio: "Cachoeira do Sul", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
-    { municipio: "Ijuí", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
-    { municipio: "Palmeira das Missões", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
-    { municipio: "Canela", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Diego Dos Santos Machado (5551998726541)", gerente: "Maxchel Joner Da Silva (51981209962)" },
-    { municipio: "Capão da Canoa", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Anderson Andrade Marins (5551997791640)", gerente: "Michel Romanini (44984552705)" },
-    { municipio: "Carazinho", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Cassio Fernando Rocha Oliveira (55(54) 9960-84221)", gerente: "Maxchel Joner Da Silva (51981209962)" },
-    { municipio: "Carlos Barbosa", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Diego Dos Santos Machado (5551998726541)", gerente: "Maxchel Joner Da Silva (51981209962)" },
-    { municipio: "Charqueadas", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Diego Richter Silva (5551997549214)", gerente: "Michel Romanini (44984552705)" },
-    { municipio: "Dois Irmãos", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Marcio Andre da Rosa Mendes (5551995892075)", gerente: "Michel Romanini (44984552705)" },
-    { municipio: "Erechim", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Cassio Fernando Rocha Oliveira (55(54) 9960-84221)", gerente: "Maxchel Joner Da Silva (51981209962)" },
-    { municipio: "Estrela", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Diego Dos Santos Machado (5551998726541)", gerente: "Maxchel Joner Da Silva (51981209962)" },
-    { municipio: "Flores da Cunha", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Anderson De Lima Velho 54997073335)", gerente: "Maxchel Joner Da Silva (51981209962)" },
-    { municipio: "Garibaldi", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Diego Dos Santos Machado (5551998726541)", gerente: "Maxchel Joner Da Silva (51981209962)" },
-    { municipio: "Gramado", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Diego Dos Santos Machado (5551998726541)", gerente: "Maxchel Joner Da Silva (51981209962)" },
-    { municipio: "Igrejinha", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Marcio Andre da Rosa Mendes (5551995892075)", gerente: "Michel Romanini (44984552705)" },
-    { municipio: "Santa Rosa", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
-    { municipio: "Ivotí", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Marcio Andre da Rosa Mendes (5551995892075)", gerente: "Michel Romanini (44984552705)" },
-    { municipio: "Lagoa Vermelha", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Cassio Fernando Rocha Oliveira (55(54) 9960-84221)", gerente: "Maxchel Joner Da Silva (51981209962)" },
-    { municipio: "Lajeado", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Diego Dos Santos Machado (5551998726541)", gerente: "Maxchel Joner Da Silva (51981209962)" },
-    { municipio: "Nova Petrópolis", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Diego Dos Santos Machado (5551998726541)", gerente: "Maxchel Joner Da Silva (51981209962)" },
-    { municipio: "Osório", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Anderson Andrade Marins (5551997791640)", gerente: "Michel Romanini (44984552705)" },
-    { municipio: "Sant'Ana do Livramento", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
-    { municipio: "Santo Ângelo", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
-    { municipio: "Três de Maio", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
-    { municipio: "Uruguaiana", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
-    { municipio: "São Marcos", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Anderson De Lima Velho 54997073335)", gerente: "Maxchel Joner Da Silva (51981209962)" },
-    { municipio: "Sarandi", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Cassio Fernando Rocha Oliveira (55(54) 9960-84221)", gerente: "Maxchel Joner Da Silva (51981209962)" },
-    { municipio: "Taquara", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Marcio Andre da Rosa Mendes (5551995892075)", gerente: "Michel Romanini (44984552705)" },
-    { municipio: "Teutônia", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Diego Dos Santos Machado (5551998726541)", gerente: "Maxchel Joner Da Silva (51981209962)" },
-    { municipio: "Torres", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Anderson Andrade Marins (5551997791640)", gerente: "Michel Romanini (44984552705)" },
-    { municipio: "Tramandaí", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Anderson Andrade Marins (5551997791640)", gerente: "Michel Romanini (44984552705)" },
-    { municipio: "Venâncio Aires", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Claudio Soares Liberalesso (54999269670)", gerente: "Maxchel Joner da Silva (51981209962)" },
-    { municipio: "Bagé", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Deomar Almeida De Oliveira (53984254561)", gerente: "Maxchel Joner da Silva (51981209962)" },
-    { municipio: "Vacaria", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Cassio Fernando Rocha Oliveira (55(54) 9960-84221)", gerente: "Maxchel Joner Da Silva (51981209962)" },
-    { municipio: "Camaquã", uf: "RS", coordenador: "Marcos Vinicius Xavier Dutra (51999536675)", supervisor: "Deomar Almeida De Oliveira (53984254561)", gerente: "Maxchel Joner da Silva (51981209962)" },
-    { municipio: "Veranópolis", uf: "RS", coordenador: "Jeferson Gardino (47992012274)", supervisor: "Diego Dos Santos Machado (5551998726541)", gerente: "Maxchel Joner Da Silva (51981209962)" },
-    { municipio: "Xangri-lá", uf: "RS", coordenador: "João Andrioli (41992449441)", supervisor: "Anderson Andrade Marins (5551997791640)", gerente: "Michel Romanini (44984552705)" },
-    { municipio: "ANGRA DOS REIS", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "ARARUAMA", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "ARMACAO DOS BUZIOS", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "BARRA DO PIRAI", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "BARRA MANSA", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "CABO FRIO", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "CAMPOS DOS GOYTACAZES", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "IGUABA GRANDE", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "ITAPERUNA", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "MANGARATIBA", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "NITEROI", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "NOVA IGUACU", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "PARATY", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "PETROPOLIS", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "RESENDE", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "RIO BONITO", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "RIO DAS OSTRAS", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "SAO PEDRO DA ALDEIA", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "TERESOPOLIS", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "TRES RIOS", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "VALENCA", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" },
-    { municipio: "VOLTA REDONDA", uf: "RJ", coordenador: "Caxero (21968991929)", supervisor: "Jesus Pedruzi (21972609581)", gerente: "joao Lima (21972441065)" }
+const escalonamentoVivo = [
+    { municipio: "Formosa", uf: "GO", sigla: "FRM", fila: "PLANTA EXTERNA N1 / GO 3", eps: "ABILITY", supervisorVivo: "Alessandro Rezende Da Silva (62) 98400-6294", emailSupervisorVivo: "alessandro.rsilva@telefonica.com", coordenadorVivo: "Daniel Domingos Viana (62) 98404-3448", emailCoordenadorVivo: "daniel.dviana@telefonica.com", gerenteVivo: "Daniel De Jesus Farias (62) 99997-1222", emailGerenteVivo: "daniel.farias@telefonica.com" },
+    { municipio: "Inhumas", uf: "GO", sigla: "IUS", fila: "PLANTA EXTERNA N1 / GO 3", eps: "ABILITY", supervisorVivo: "Alessandro Rezende Da Silva (62) 98400-6294", emailSupervisorVivo: "alessandro.rsilva@telefonica.com", coordenadorVivo: "Daniel Domingos Viana (62) 98404-3448", emailCoordenadorVivo: "daniel.dviana@telefonica.com", gerenteVivo: "Daniel De Jesus Farias (62) 99997-1222", emailGerenteVivo: "daniel.farias@telefonica.com" },
+    { municipio: "Itaberaí", uf: "GO", sigla: "IEI", fila: "PLANTA EXTERNA N1 / GO 3", eps: "ABILITY", supervisorVivo: "Alessandro Rezende Da Silva (62) 98400-6294", emailSupervisorVivo: "alessandro.rsilva@telefonica.com", coordenadorVivo: "Daniel Domingos Viana (62) 98404-3448", emailCoordenadorVivo: "daniel.dviana@telefonica.com", gerenteVivo: "Daniel De Jesus Farias (62) 99997-1222", emailGerenteVivo: "daniel.farias@telefonica.com" },
+    { municipio: "Ji-Paraná", uf: "RO", sigla: "JIP", fila: "PLANTA EXTERNA N1 / RO", eps: "ABILITY", supervisorVivo: "", emailSupervisorVivo: "", coordenadorVivo: "", emailCoordenadorVivo: "", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Aracruz", uf: "ES", sigla: "ACZ", fila: "PLANTA EXTERNA N1 / ES", eps: "Hallen", supervisorVivo: "Fabiano 11 97492-1488", emailSupervisorVivo: "", coordenadorVivo: "Natã 21 974163175", emailCoordenadorVivo: "", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Cachoeiro De Itapemirim", uf: "ES", sigla: "CIM", fila: "PLANTA EXTERNA N1 / ES", eps: "Hallen", supervisorVivo: "Fabiano 11 97492-1488", emailSupervisorVivo: "", coordenadorVivo: "Natã 21 974163175", emailCoordenadorVivo: "", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Guaraparí", uf: "ES", sigla: "GRI", fila: "PLANTA EXTERNA N1 / ES", eps: "Hallen", supervisorVivo: "Fabiano 11 97492-1488", emailSupervisorVivo: "", coordenadorVivo: "Natã 21 974163175", emailCoordenadorVivo: "", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Santa Maria De Jetibá", uf: "ES", sigla: "SMJ", fila: "PLANTA EXTERNA N1 / ES", eps: "Hallen", supervisorVivo: "Fabiano 11 97492-1488", emailSupervisorVivo: "", coordenadorVivo: "Natã 21 974163175", emailCoordenadorVivo: "", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "São Mateus", uf: "ES", sigla: "SMT", fila: "PLANTA EXTERNA N1 / ES", eps: "Hallen", supervisorVivo: "Fabiano 11 97492-1488", emailSupervisorVivo: "", coordenadorVivo: "Natã 21 974163175", emailCoordenadorVivo: "", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Viana", uf: "ES", sigla: "VIA", fila: "PLANTA EXTERNA N1 / ES", eps: "Hallen", supervisorVivo: "Fabiano 11 97492-1488", emailSupervisorVivo: "", coordenadorVivo: "Natã 21 974163175", emailCoordenadorVivo: "", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Manaus", uf: "AM", sigla: "MNS", fila: "PLANTA EXTERNA N1 / AM", eps: "ONDACOM", supervisorVivo: "Júlio Nascimento (92) 99310-9714", emailSupervisorVivo: "", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Macapá", uf: "AP", sigla: "MPA", fila: "PLANTA EXTERNA N1 / AP", eps: "ONDACOM", supervisorVivo: "Paulo Teixira (42) 99162-4090", emailSupervisorVivo: "", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Caldas Novas", uf: "GO", sigla: "CLV", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", supervisorVivo: "Josiel Alves De Oliveira (62) 99858-9604", emailSupervisorVivo: "josiel.oliveira@telefonica.com", coordenadorVivo: "Danilo Antonio De Melo (62) 98470-6369", emailCoordenadorVivo: "danilo.melo@telefonica.com", gerenteVivo: "Daniel De Jesus Farias (62) 99997-1222", emailGerenteVivo: "daniel.farias@telefonica.com" },
+    { municipio: "Catalão", uf: "GO", sigla: "CTL", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", supervisorVivo: "Josiel Alves De Oliveira (62) 99858-9604", emailSupervisorVivo: "josiel.oliveira@telefonica.com", coordenadorVivo: "Danilo Antonio De Melo (62) 98470-6369", emailCoordenadorVivo: "danilo.melo@telefonica.com", gerenteVivo: "Daniel De Jesus Farias (62) 99997-1222", emailGerenteVivo: "daniel.farias@telefonica.com" },
+    { municipio: "Itumbiara", uf: "GO", sigla: "IUB", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", supervisorVivo: "Josiel Alves De Oliveira (62) 99858-9604", emailSupervisorVivo: "josiel.oliveira@telefonica.com", coordenadorVivo: "Celso Correa (47) 99252-7948", emailCoordenadorVivo: "celso.correa@telefonica.com.br", gerenteVivo: "Daniel De Jesus Farias (62) 99997-1222", emailGerenteVivo: "daniel.farias@telefonica.com" },
+    { municipio: "Jaraguá", uf: "GO", sigla: "JRG", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", supervisorVivo: "Creone Moreira Souto (62) 98419-0813", emailSupervisorVivo: "creone.souto@telefonica.com", coordenadorVivo: "Alessandro José Lemes (63) 99991-4354", emailCoordenadorVivo: "alessandro.lemes@telefonica.com", gerenteVivo: "Daniel De Jesus Farias (62) 99997-1222", emailGerenteVivo: "daniel.farias@telefonica.com" },
+    { municipio: "Jataí", uf: "GO", sigla: "JTI", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", supervisorVivo: "Everton Valim Menezes (64) 98438-8830", emailSupervisorVivo: "everton.menezes@telefonica.com", coordenadorVivo: "Danilo Antonio De Melo (62) 98470-6369", emailCoordenadorVivo: "danilo.melo@telefonica.com", gerenteVivo: "Daniel De Jesus Farias (62) 99997-1222", emailGerenteVivo: "daniel.farias@telefonica.com" },
+    { municipio: "Mineiros", uf: "GO", sigla: "MNI", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", supervisorVivo: "Everton Valim Menezes (64) 98438-8830", emailSupervisorVivo: "everton.menezes@telefonica.com", coordenadorVivo: "Danilo Antonio De Melo (62) 98470-6369", emailCoordenadorVivo: "danilo.melo@telefonica.com", gerenteVivo: "Daniel De Jesus Farias (62) 99997-1222", emailGerenteVivo: "daniel.farias@telefonica.com" },
+    { municipio: "Morrinhos", uf: "GO", sigla: "MIH", fila: "PLANTA EXTERNA N1 / GO 2", eps: "ONDACOM", supervisorVivo: "Josiel Alves De Oliveira (62) 99858-9604", emailSupervisorVivo: "josiel.oliveira@telefonica.com", coordenadorVivo: "Danilo Antonio De Melo (62) 98470-6369", emailCoordenadorVivo: "danilo.melo@telefonica.com", gerenteVivo: "Daniel De Jesus Farias (62) 99997-1222", emailGerenteVivo: "daniel.farias@telefonica.com" },
+    { municipio: "Açailândia", uf: "MA", sigla: "ACD", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", supervisorVivo: "Tiago Araújo (11) 93448-3914", emailSupervisorVivo: "", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Balsas", uf: "MA", sigla: "BLA", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", supervisorVivo: "Tiago Araújo (11) 93448-3914", emailSupervisorVivo: "", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Imperatriz", uf: "MA", sigla: "ITZ", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", supervisorVivo: "Tiago Araújo (11) 93448-3914", emailSupervisorVivo: "", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Paço Do Lumiar", uf: "MA", sigla: "PCL", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", supervisorVivo: "Tiago Araújo (11) 93448-3914", emailSupervisorVivo: "", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Santa Inês", uf: "MA", sigla: "SIS", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", supervisorVivo: "Tiago Araújo (11) 93448-3914", emailSupervisorVivo: "", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "São José De Ribamar", uf: "MA", sigla: "SJE", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", supervisorVivo: "Tiago Araújo (11) 93448-3914", emailSupervisorVivo: "", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "São Luís", uf: "MA", sigla: "SLS", fila: "PLANTA EXTERNA N1 / MA", eps: "ONDACOM", supervisorVivo: "Tiago Araújo (11) 93448-3914", emailSupervisorVivo: "", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Uberaba", uf: "MG", sigla: "URA", fila: "PLANTA EXTERNA N1 / MG 1", eps: "ONDACOM", supervisorVivo: "Alessandro De Jesus Moreira (35) 98881-4115", emailSupervisorVivo: "alessandro.moreira@fibrasil.com.br", coordenadorVivo: "Felipe Da Silva Breda (34) 99941-8635", emailCoordenadorVivo: "felipe.breda@telefonica.com", gerenteVivo: "Rodrigo Gervini De Carvalho (21) 97602-7070", emailGerenteVivo: "rodrigo.gcarvalho@telefonica.com" },
+    { municipio: "Uberlândia", uf: "MG", sigla: "ULA", fila: "PLANTA EXTERNA N1 / MG 1", eps: "ONDACOM", supervisorVivo: "Alessandro De Jesus Moreira (35) 98881-4115", emailSupervisorVivo: "alessandro.moreira@fibrasil.com.br", coordenadorVivo: "Felipe Da Silva Breda (34) 99941-8635", emailCoordenadorVivo: "felipe.breda@telefonica.com", gerenteVivo: "Rodrigo Gervini De Carvalho (21) 97602-7070", emailGerenteVivo: "rodrigo.gcarvalho@telefonica.com" },
+    { municipio: "Três Lagoas", uf: "MS", sigla: "TLS", fila: "PLANTA EXTERNA N1 / MS", eps: "ONDACOM", supervisorVivo: "Anderson Rodrigues Da Silva/Johnny De Matos (67) 99636-9476 / (67) 99307-5445", emailSupervisorVivo: "anderson.rsilva@telefonica.com /  johnny.matos@telefonica.com", coordenadorVivo: "Joaquim De Morais Silva (67) 99809-5250", emailCoordenadorVivo: "joaquim.silva@telefonica.com", gerenteVivo: "Gilson Xavier Ferreira (67) 99234-5090", emailGerenteVivo: "ferreira.gilson@telefonica.com" },
+    { municipio: "Campo Verde", uf: "MT", sigla: "CZV", fila: "PLANTA EXTERNA N1 / MT  2", eps: "ONDACOM", supervisorVivo: "Michael Chabalin Ferraz (65) 99810-2437", emailSupervisorVivo: "michael.ferraz@telefonica.com", coordenadorVivo: "Vitor Hugo Fabricio Godoy (67) 99847-6993", emailCoordenadorVivo: "vitor.godoy@telefonica.com", gerenteVivo: "Gilson Xavier Ferreira (67) 99234-5090", emailGerenteVivo: "ferreira.gilson@telefonica.com" },
+    { municipio: "Lucas Do Rio Verde", uf: "MT", sigla: "LRV", fila: "PLANTA EXTERNA N1 / MT 1", eps: "ONDACOM", supervisorVivo: "Michael Chabalin Ferraz (65) 99810-2437", emailSupervisorVivo: "michael.ferraz@telefonica.com", coordenadorVivo: "Vitor Hugo Fabricio Godoy (67) 99847-6993", emailCoordenadorVivo: "vitor.godoy@telefonica.com", gerenteVivo: "Gilson Xavier Ferreira (67) 99234-5090", emailGerenteVivo: "ferreira.gilson@telefonica.com" },
+    { municipio: "Nova Mutum", uf: "MT", sigla: "NMM", fila: "PLANTA EXTERNA N1 / MT 1", eps: "ONDACOM", supervisorVivo: "Michael Chabalin Ferraz (65) 99810-2437", emailSupervisorVivo: "michael.ferraz@telefonica.com", coordenadorVivo: "Vitor Hugo Fabricio Godoy (67) 99847-6993", emailCoordenadorVivo: "vitor.godoy@telefonica.com", gerenteVivo: "Gilson Xavier Ferreira (67) 99234-5090", emailGerenteVivo: "ferreira.gilson@telefonica.com" },
+    { municipio: "Primavera Do Leste", uf: "MT", sigla: "PVT", fila: "PLANTA EXTERNA N1 / MT  2", eps: "ONDACOM", supervisorVivo: "Michael Chabalin Ferraz (65) 99810-2437", emailSupervisorVivo: "michael.ferraz@telefonica.com", coordenadorVivo: "Vitor Hugo Fabricio Godoy (67) 99847-6993", emailCoordenadorVivo: "vitor.godoy@telefonica.com", gerenteVivo: "Gilson Xavier Ferreira (67) 99234-5090", emailGerenteVivo: "ferreira.gilson@telefonica.com" },
+    { municipio: "Sinop", uf: "MT", sigla: "SNO", fila: "PLANTA EXTERNA N1 / MT 2", eps: "ONDACOM", supervisorVivo: "Michael Chabalin Ferraz (65) 99810-2437", emailSupervisorVivo: "michael.ferraz@telefonica.com", coordenadorVivo: "Vitor Hugo Fabricio Godoy (67) 99847-6993", emailCoordenadorVivo: "vitor.godoy@telefonica.com", gerenteVivo: "Gilson Xavier Ferreira (67) 99234-5090", emailGerenteVivo: "ferreira.gilson@telefonica.com" },
+    { municipio: "Sorriso", uf: "MT", sigla: "SSZ", fila: "PLANTA EXTERNA N1 / MT 1", eps: "ONDACOM", supervisorVivo: "Michael Chabalin Ferraz (65) 99810-2437", emailSupervisorVivo: "michael.ferraz@telefonica.com", coordenadorVivo: "Vitor Hugo Fabricio Godoy (67) 99847-6993", emailCoordenadorVivo: "vitor.godoy@telefonica.com", gerenteVivo: "Gilson Xavier Ferreira (67) 99234-5090", emailGerenteVivo: "ferreira.gilson@telefonica.com" },
+    { municipio: "Tangará Da Serra", uf: "MT", sigla: "TGS", fila: "PLANTA EXTERNA N1 / MT  2", eps: "ONDACOM", supervisorVivo: "Michael Chabalin Ferraz (65) 99810-2437", emailSupervisorVivo: "michael.ferraz@telefonica.com", coordenadorVivo: "Vitor Hugo Fabricio Godoy (67) 99847-6993", emailCoordenadorVivo: "vitor.godoy@telefonica.com", gerenteVivo: "Gilson Xavier Ferreira (67) 99234-5090", emailGerenteVivo: "ferreira.gilson@telefonica.com" },
+    { municipio: "Altamira", uf: "PA", sigla: "ATM", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", supervisorVivo: "Bruno Ayres (91) 98027-1952", emailSupervisorVivo: "", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Belém", uf: "PA", sigla: "BLM", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", supervisorVivo: "Bruno Ayres (91) 98027-1952", emailSupervisorVivo: "", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Canaã Dos Carajás", uf: "PA", sigla: "CKJ", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", supervisorVivo: "Bruno Ayres (91) 98027-1952", emailSupervisorVivo: "", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Capanema", uf: "PA", sigla: "CPN", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", supervisorVivo: "Bruno Ayres (91) 98027-1952", emailSupervisorVivo: "", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Castanhal", uf: "PA", sigla: "CAH", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", supervisorVivo: "Bruno Ayres (91) 98027-1952", emailSupervisorVivo: "", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Paragominas", uf: "PA", sigla: "PGN", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", supervisorVivo: "Bruno Ayres (91) 98027-1952", emailSupervisorVivo: "", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Parauapebas", uf: "PA", sigla: "PUP", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", supervisorVivo: "Bruno Ayres (91) 98027-1952", emailSupervisorVivo: "", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Redenção", uf: "PA", sigla: "RDO", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", supervisorVivo: "Bruno Ayres (91) 98027-1952", emailSupervisorVivo: "", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Tucuruí", uf: "PA", sigla: "TUU", fila: "PLANTA EXTERNA N1 / PA", eps: "ONDACOM", supervisorVivo: "Bruno Ayres (91) 98027-1952", emailSupervisorVivo: "", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "", emailGerenteVivo: "" },
+    { municipio: "Araguaína", uf: "TO", sigla: "ARN", fila: "PLANTA EXTERNA N1 / TO", eps: "ONDACOM", supervisorVivo: "Ribas Junios Gomes Campelo/Ramohn Caetano Da Silva (63) 99944-7319 / (63) 99992-6212", emailSupervisorVivo: "ribas.campelo@telefonica.com / ramohn.silva@telefonica.com", coordenadorVivo: "Alessandro José Lemes (63) 99991-4354", emailCoordenadorVivo: "alessandro.lemes@telefonica.com", gerenteVivo: "Daniel De Jesus Farias (62) 99997-1222", emailGerenteVivo: "daniel.farias@telefonica.com" },
+    { municipio: "Palmas", uf: "TO", sigla: "PMJ", fila: "PLANTA EXTERNA N1 / TO", eps: "ONDACOM", supervisorVivo: "Ribas Junios Gomes Campelo/Ramohn Caetano Da Silva (63) 99944-7319 / (63) 99992-6212", emailSupervisorVivo: "ribas.campelo@telefonica.com / ramohn.silva@telefonica.com", coordenadorVivo: "Alessandro José Lemes (63) 99991-4354", emailCoordenadorVivo: "alessandro.lemes@telefonica.com", gerenteVivo: "Daniel De Jesus Farias (62) 99997-1222", emailGerenteVivo: "daniel.farias@telefonica.com" },
+    { municipio: "Arapiraca", uf: "AL", sigla: "AIR", fila: "PLANTA EXTERNA N1 / AL", eps: "R2", supervisorVivo: "Denilson Tragante (11) 94145-1175", emailSupervisorVivo: "denilson.tragante@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto/Bruno Leonardo Bezerra De Araujo Favoreto (71) 99980-2017 / (41) 99138-3727", emailCoordenadorVivo: "jose.neto3@telefonica.com / bruno.favoreto@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Arraial D'Ajuda", uf: "BA", sigla: "ALDA", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", supervisorVivo: "Denilson Tragante (11) 94145-1175", emailSupervisorVivo: "denilson.tragante@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto/Bruno Leonardo Bezerra De Araujo Favoreto (71) 99980-2017 / (41) 99138-3727", emailCoordenadorVivo: "jose.neto3@telefonica.com / bruno.favoreto@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Barreiras", uf: "BA", sigla: "BES", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", supervisorVivo: "Denilson Tragante (11) 94145-1175", emailSupervisorVivo: "denilson.tragante@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto/Bruno Leonardo Bezerra De Araujo Favoreto (71) 99980-2017 / (41) 99138-3727", emailCoordenadorVivo: "jose.neto3@telefonica.com / bruno.favoreto@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Eunápolis", uf: "BA", sigla: "EUS", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", supervisorVivo: "Denilson Tragante (11) 94145-1175", emailSupervisorVivo: "denilson.tragante@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto/Bruno Leonardo Bezerra De Araujo Favoreto (71) 99980-2017 / (41) 99138-3727", emailCoordenadorVivo: "jose.neto3@telefonica.com / bruno.favoreto@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Guanambi", uf: "BA", sigla: "GNB", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", supervisorVivo: "Denilson Tragante (11) 94145-1175", emailSupervisorVivo: "denilson.tragante@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto/Bruno Leonardo Bezerra De Araujo Favoreto (71) 99980-2017 / (41) 99138-3727", emailCoordenadorVivo: "jose.neto3@telefonica.com / bruno.favoreto@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Ilhéus", uf: "BA", sigla: "ILH", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", supervisorVivo: "Denilson Tragante (11) 94145-1175", emailSupervisorVivo: "denilson.tragante@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto/Bruno Leonardo Bezerra De Araujo Favoreto (71) 99980-2017 / (41) 99138-3727", emailCoordenadorVivo: "jose.neto3@telefonica.com / bruno.favoreto@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Itabuna", uf: "BA", sigla: "ITB", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", supervisorVivo: "Denilson Tragante (11) 94145-1175", emailSupervisorVivo: "denilson.tragante@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto/Bruno Leonardo Bezerra De Araujo Favoreto (71) 99980-2017 / (41) 99138-3727", emailCoordenadorVivo: "jose.neto3@telefonica.com / bruno.favoreto@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Jequié", uf: "BA", sigla: "JEE", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", supervisorVivo: "Denilson Tragante (11) 94145-1175", emailSupervisorVivo: "denilson.tragante@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto/Bruno Leonardo Bezerra De Araujo Favoreto (71) 99980-2017 / (41) 99138-3727", emailCoordenadorVivo: "jose.neto3@telefonica.com / bruno.favoreto@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Luís Eduardo Magalhães", uf: "BA", sigla: "MIOO", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", supervisorVivo: "Denilson Tragante (11) 94145-1175", emailSupervisorVivo: "denilson.tragante@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto/Bruno Leonardo Bezerra De Araujo Favoreto (71) 99980-2017 / (41) 99138-3727", emailCoordenadorVivo: "jose.neto3@telefonica.com / bruno.favoreto@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Porto Seguro", uf: "BA", sigla: "PGU", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", supervisorVivo: "Denilson Tragante (11) 94145-1175", emailSupervisorVivo: "denilson.tragante@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto/Bruno Leonardo Bezerra De Araujo Favoreto (71) 99980-2017 / (41) 99138-3727", emailCoordenadorVivo: "jose.neto3@telefonica.com / bruno.favoreto@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Santo Antônio De Jesus", uf: "BA", sigla: "SNJ", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", supervisorVivo: "Denilson Tragante (11) 94145-1175", emailSupervisorVivo: "denilson.tragante@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto/Bruno Leonardo Bezerra De Araujo Favoreto (71) 99980-2017 / (41) 99138-3727", emailCoordenadorVivo: "jose.neto3@telefonica.com / bruno.favoreto@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Teixeira De Freitas", uf: "BA", sigla: "TAF", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", supervisorVivo: "Denilson Tragante (11) 94145-1175", emailSupervisorVivo: "denilson.tragante@telefonica.com", coordenadorVivo: "Bruno Leonardo Bezerra De Araujo Favoreto (41) 99138-3727", emailCoordenadorVivo: "bruno.favoreto@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Trancoso", uf: "BA", sigla: "TCOS", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", supervisorVivo: "Denilson Tragante (11) 94145-1175", emailSupervisorVivo: "denilson.tragante@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto/Bruno Leonardo Bezerra De Araujo Favoreto (71) 99980-2017 / (41) 99138-3727", emailCoordenadorVivo: "jose.neto3@telefonica.com / bruno.favoreto@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Vitória Da Conquista", uf: "BA", sigla: "VCA", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", supervisorVivo: "Denilson Tragante (11) 94145-1175", emailSupervisorVivo: "denilson.tragante@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto/Bruno Leonardo Bezerra De Araujo Favoreto (71) 99980-2017 / (41) 99138-3727", emailCoordenadorVivo: "jose.neto3@telefonica.com / bruno.favoreto@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Crato", uf: "CE", sigla: "CTO", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", supervisorVivo: "Douglas Dos Reis Mata (86) 98106-6049", emailSupervisorVivo: "douglasd.mata@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Juazeiro Do Norte", uf: "CE", sigla: "JNE", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", supervisorVivo: "Douglas Dos Reis Mata (86) 98106-6049", emailSupervisorVivo: "douglasd.mata@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Sobral", uf: "CE", sigla: "SOL", fila: "PLANTA EXTERNA N1 / CE", eps: "R2", supervisorVivo: "Douglas Dos Reis Mata (86) 98106-6049", emailSupervisorVivo: "douglasd.mata@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Petrolina", uf: "PE", sigla: "PTA", fila: "PLANTA EXTERNA N1 / PE 1", eps: "R2", supervisorVivo: "Samuel Costa (11) 94323-7772", emailSupervisorVivo: "samueld.costa@telefonica.com", coordenadorVivo: "Fred Oliveira (81) 99229-4398", emailCoordenadorVivo: "fred.silva@telefonica.com", gerenteVivo: "Cristian Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Parnaíba", uf: "PI", sigla: "PNA", fila: "PLANTA EXTERNA N1 / PI", eps: "R2", supervisorVivo: "Douglas Dos Reis Mata (86) 98106-6049", emailSupervisorVivo: "douglasd.mata@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Lagarto", uf: "SE", sigla: "LAT", fila: "PLANTA EXTERNA N1 / BA", eps: "R2", supervisorVivo: "Denilson Tragante (11) 94145-1175", emailSupervisorVivo: "denilson.tragante@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto/Bruno Leonardo Bezerra De Araujo Favoreto (71) 99980-2017 / (41) 99138-3727", emailCoordenadorVivo: "jose.neto3@telefonica.com / bruno.favoreto@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Divinópolis", uf: "MG", sigla: "DVL", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", supervisorVivo: "Roberto Valeriano De Souza (31) 97104-0256", emailSupervisorVivo: "roberto.vsouza@telefonica.com", coordenadorVivo: "Juliano Nunes De Oliveira (31) 99591-9305", emailCoordenadorVivo: "juliano.noliveira@telefonica.com", gerenteVivo: "Bruno Junqueira Leitao De Almeida (31) 99910-2830", emailGerenteVivo: "bruno.jalmeida@telefonica.com" },
+    { municipio: "Ibirité", uf: "MG", sigla: "IIE", fila: "PLANTA EXTERNA N1 / MG 2", eps: "RADIANTE", supervisorVivo: "Roberto Valeriano De Souza (31) 97104-0256", emailSupervisorVivo: "roberto.vsouza@telefonica.com", coordenadorVivo: "Juliano Nunes De Oliveira (31) 99591-9305", emailCoordenadorVivo: "juliano.noliveira@telefonica.com", gerenteVivo: "Bruno Junqueira Leitao De Almeida (31) 99910-2830", emailGerenteVivo: "bruno.jalmeida@telefonica.com" },
+    { municipio: "Poços De Caldas", uf: "MG", sigla: "PCS", fila: "PLANTA EXTERNA N1 / MG 4", eps: "RADIANTE", supervisorVivo: "Alessandro De Jesus Moreira (35) 98881-4115", emailSupervisorVivo: "alessandro.moreira@fibrasil.com.br", coordenadorVivo: "Juliano Ferreira De Souza (31) 99970-8223", emailCoordenadorVivo: "juliano.fsouza@telefonica.com", gerenteVivo: "Bruno Junqueira Leitão De Almeida (31) 99910-2830", emailGerenteVivo: "bruno.jalmeida@telefonica.com" },
+    { municipio: "Pouso Alegre", uf: "MG", sigla: "PSA", fila: "PLANTA EXTERNA N1 / MG 4", eps: "RADIANTE", supervisorVivo: "Alessandro De Jesus Moreira (35) 98881-4115", emailSupervisorVivo: "alessandro.moreira@fibrasil.com.br", coordenadorVivo: "Juliano Ferreira De Souza (31) 99970-8223", emailCoordenadorVivo: "juliano.fsouza@telefonica.com", gerenteVivo: "Bruno Junqueira Leitão De Almeida (31) 99910-2830", emailGerenteVivo: "bruno.jalmeida@telefonica.com" },
+    { municipio: "Ribeirão Das Neves", uf: "MG", sigla: "RNS", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", supervisorVivo: "Jair Rosa de Melo (31) 99955-7573", emailSupervisorVivo: "jair.melo@telefonica.com", coordenadorVivo: "Juliano Nunes de Oliveira 31995919305", emailCoordenadorVivo: "juliano.noliveira@telefonica.com", gerenteVivo: "Bruno Junqueira Leitao 31999102830", emailGerenteVivo: "bruno.jalmeida@telefonica.com" },
+    { municipio: "Santa Luzia", uf: "MG", sigla: "SLU", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", supervisorVivo: "Roberto Valeriano De Souza (31) 97104-0256", emailSupervisorVivo: "roberto.vsouza@telefonica.com", coordenadorVivo: "Juliano Nunes De Oliveira (31) 99591-9305", emailCoordenadorVivo: "juliano.noliveira@telefonica.com", gerenteVivo: "Bruno Junqueira Leitao De Almeida (31) 99910-2830", emailGerenteVivo: "bruno.jalmeida@telefonica.com" },
+    { municipio: "Sete Lagoas", uf: "MG", sigla: "SLA", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", supervisorVivo: "Jair Rosa De Melo (31) 99955-7573", emailSupervisorVivo: "jair.melo@telefonica.com", coordenadorVivo: "Juliano Nunes De Oliveira (31) 99591-9305", emailCoordenadorVivo: "juliano.noliveira@telefonica.com", gerenteVivo: "Bruno Junqueira Leitao De Almeida (31) 99910-2830", emailGerenteVivo: "bruno.jalmeida@telefonica.com" },
+    { municipio: "Timóteo", uf: "MG", sigla: "TTO", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", supervisorVivo: "Alessandro De Jesus Moreira (35) 98881-4115", emailSupervisorVivo: "alessandro.moreira@fibrasil.com.br", coordenadorVivo: "Vitor Alves De Oliveira (38) 99941-9242", emailCoordenadorVivo: "vitor.aoliveira@telefonica.com", gerenteVivo: "Bruno Junqueira Leitão De Almeida (31) 99910-2830", emailGerenteVivo: "bruno.jalmeida@telefonica.com" },
+    { municipio: "Três Corações", uf: "MG", sigla: "TCS", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", supervisorVivo: "Alessandro De Jesus Moreira (35) 98881-4115", emailSupervisorVivo: "alessandro.moreira@fibrasil.com.br", coordenadorVivo: "Juliano Ferreira De Souza (31) 99970-8223", emailCoordenadorVivo: "juliano.fsouza@telefonica.com", gerenteVivo: "Bruno Junqueira Leitão De Almeida (31) 99910-2830", emailGerenteVivo: "bruno.jalmeida@telefonica.com" },
+    { municipio: "Três Pontas", uf: "MG", sigla: "TPS", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", supervisorVivo: "Alessandro De Jesus Moreira (35) 98881-4115", emailSupervisorVivo: "alessandro.moreira@fibrasil.com.br", coordenadorVivo: "Juliano Ferreira De Souza (31) 99970-8223", emailCoordenadorVivo: "juliano.fsouza@telefonica.com", gerenteVivo: "Bruno Junqueira Leitão De Almeida (31) 99910-2830", emailGerenteVivo: "bruno.jalmeida@telefonica.com" },
+    { municipio: "Varginha", uf: "MG", sigla: "VGA", fila: "PLANTA EXTERNA N1 / MG 3", eps: "RADIANTE", supervisorVivo: "Alessandro De Jesus Moreira (35) 98881-4115", emailSupervisorVivo: "alessandro.moreira@fibrasil.com.br", coordenadorVivo: "Juliano Ferreira De Souza (31) 99970-8223", emailCoordenadorVivo: "juliano.fsouza@telefonica.com", gerenteVivo: "Bruno Junqueira Leitão De Almeida (31) 99910-2830", emailGerenteVivo: "bruno.jalmeida@telefonica.com" },
+    { municipio: "Angra Dos Reis", uf: "RJ", sigla: "ARS", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "Araruama", uf: "RJ", sigla: "AMA", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "Armação Dos Búzios", uf: "RJ", sigla: "ARBU", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "Barra Do Piraí", uf: "RJ", sigla: "BPI", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "Barra Mansa", uf: "RJ", sigla: "BMA", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "Cabo Frio", uf: "RJ", sigla: "CBF", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "Iguaba Grande", uf: "RJ", sigla: "IGGR", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "Itaperuna", uf: "RJ", sigla: "IRA", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "Mangaratiba", uf: "RJ", sigla: "MGB", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "Nova Friburgo", uf: "RJ", sigla: "NOF", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "Paraty", uf: "RJ", sigla: "PAT", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "Petrópolis", uf: "RJ", sigla: "PTS", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "Resende", uf: "RJ", sigla: "RSD", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "Rio Bonito", uf: "RJ", sigla: "RBT", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "Rio Das Ostras", uf: "RJ", sigla: "RIOS", fila: "PLANTA EXTERNA N1 / RJ 1", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "São Pedro Da Aldeia", uf: "RJ", sigla: "SPA", fila: "PLANTA EXTERNA N1/RJ 1", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "Teresópolis", uf: "RJ", sigla: "TRL", fila: "PLANTA EXTERNA N1/RJ 1", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "Três Rios", uf: "RJ", sigla: "TRS", fila: "PLANTA EXTERNA N1/RJ 1", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "Valença", uf: "RJ", sigla: "VLC", fila: "PLANTA EXTERNA N1/RJ 1", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "Volta Redonda", uf: "RJ", sigla: "VRD", fila: "PLANTA EXTERNA N1 / RJ 2", eps: "RADIANTE", supervisorVivo: "Jesus Pedruzi (21) 97260-9581", emailSupervisorVivo: "jesus.pedruzi@fibrasil.com.br", coordenadorVivo: "Caxero (21) 96899-1929", emailCoordenadorVivo: "carlos.cjunior@telefonica.com", gerenteVivo: "Joao Lima (21) 97244-1065", emailGerenteVivo: "joao.flima@telefonica.com" },
+    { municipio: "Alegrete", uf: "RS", sigla: "ALG", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Claudio Soares Liberalesso (54) 99926-9670", emailSupervisorVivo: "claudio.liberalesso@telefonica.com", coordenadorVivo: "Marcos Vinicius Xavier Dutra (51) 99953-6675", emailCoordenadorVivo: "marcos.dutra@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Bagé", uf: "RS", sigla: "BGE", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Deomar Almeida De Oliveira (53) 98425-4561", emailSupervisorVivo: "deomar.oliveira@telefonica.com", coordenadorVivo: "Marcos Vinicius Xavier Dutra (51) 99953-6675", emailCoordenadorVivo: "marcos.dutra@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Cachoeira Do Sul", uf: "RS", sigla: "CCR", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Claudio Soares Liberalesso (54) 99926-9670", emailSupervisorVivo: "claudio.liberalesso@telefonica.com", coordenadorVivo: "Marcos Vinicius Xavier Dutra (51) 99953-6675", emailCoordenadorVivo: "marcos.dutra@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Camaquã", uf: "RS", sigla: "CAM", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Deomar Almeida De Oliveira (53) 98425-4561", emailSupervisorVivo: "deomar.oliveira@telefonica.com", coordenadorVivo: "Marcos Vinicius Xavier Dutra (51) 99953-6675", emailCoordenadorVivo: "marcos.dutra@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Canela", uf: "RS", sigla: "CEN", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Diego Dos Santos Machado (51) 99872-6541", emailSupervisorVivo: "diego.machado@telefonica.com", coordenadorVivo: "Jeferson Gardino (47) 99201-2274", emailCoordenadorVivo: "jeferson.gardino@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Capão Da Canoa", uf: "RS", sigla: "KDK", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", supervisorVivo: "Anderson Andrade Marins (51) 99779-1640", emailSupervisorVivo: "anderson.marins@telefonica.com", coordenadorVivo: "João Andrioli (41) 99244-9441", emailCoordenadorVivo: "joao.cferreira@telefonica.com", gerenteVivo: "Michel Romanini (44) 98455-2705", emailGerenteVivo: "juan.romanini@telefonica.com" },
+    { municipio: "Carazinho", uf: "RS", sigla: "CIO", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Cassio Fernando Rocha Oliveira (54) 99608-4221", emailSupervisorVivo: "cassio.oliveira@telefonica.com", coordenadorVivo: "Jeferson Gardino (47) 99201-2274", emailCoordenadorVivo: "jeferson.gardino@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Carlos Barbosa", uf: "RS", sigla: "CLB", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", supervisorVivo: "Diego Dos Santos Machado (51) 99872-6541", emailSupervisorVivo: "diego.machado@telefonica.com", coordenadorVivo: "Jeferson Gardino (47) 99201-2274", emailCoordenadorVivo: "jeferson.gardino@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Charqueadas", uf: "RS", sigla: "CQU", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Diego Richter Silva (51) 99754-9214", emailSupervisorVivo: "silva.diego@telefonica.com", coordenadorVivo: "João Andrioli (41) 99244-9441", emailCoordenadorVivo: "joao.cferreira@telefonica.com", gerenteVivo: "Michel Romanini (44) 98455-2705", emailGerenteVivo: "juan.romanini@telefonica.com" },
+    { municipio: "Dois Irmãos", uf: "RS", sigla: "DSR", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", supervisorVivo: "Marcio Andre Da Rosa Mendes (51) 99589-2075", emailSupervisorVivo: "marcio.amendes@telefonica.com", coordenadorVivo: "João Andrioli (41) 99244-9441", emailCoordenadorVivo: "joao.cferreira@telefonica.com", gerenteVivo: "Michel Romanini (44) 98455-2705", emailGerenteVivo: "juan.romanini@telefonica.com" },
+    { municipio: "Erechim", uf: "RS", sigla: "ERE", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", supervisorVivo: "Cassio Fernando Rocha Oliveira (54) 99608-4221", emailSupervisorVivo: "cassio.oliveira@telefonica.com", coordenadorVivo: "Jeferson Gardino (47) 99201-2274", emailCoordenadorVivo: "jeferson.gardino@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Estrela", uf: "RS", sigla: "ETA", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Diego Dos Santos Machado (51) 99872-6541", emailSupervisorVivo: "diego.machado@telefonica.com", coordenadorVivo: "Jeferson Gardino (47) 99201-2274", emailCoordenadorVivo: "jeferson.gardino@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Flores Da Cunha", uf: "RS", sigla: "FCA", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", supervisorVivo: "Anderson De Lima Velho (54) 99707-3335", emailSupervisorVivo: "anderson.velho@telefonica.com", coordenadorVivo: "Jeferson Gardino (47) 99201-2274", emailCoordenadorVivo: "jeferson.gardino@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Garibaldi", uf: "RS", sigla: "GRD", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", supervisorVivo: "Diego Dos Santos Machado (51) 99872-6541", emailSupervisorVivo: "diego.machado@telefonica.com", coordenadorVivo: "Jeferson Gardino (47) 99201-2274", emailCoordenadorVivo: "jeferson.gardino@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Gramado", uf: "RS", sigla: "GDO", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Diego Dos Santos Machado (51) 99872-6541", emailSupervisorVivo: "diego.machado@telefonica.com", coordenadorVivo: "Jeferson Gardino (47) 99201-2274", emailCoordenadorVivo: "jeferson.gardino@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Igrejinha", uf: "RS", sigla: "IJH", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Marcio Andre Da Rosa Mendes (51) 99589-2075", emailSupervisorVivo: "marcio.amendes@telefonica.com", coordenadorVivo: "João Andrioli (41) 99244-9441", emailCoordenadorVivo: "joao.cferreira@telefonica.com", gerenteVivo: "Michel Romanini (44) 98455-2705", emailGerenteVivo: "juan.romanini@telefonica.com" },
+    { municipio: "Ijuí", uf: "RS", sigla: "IJI", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Claudio Soares Liberalesso (54) 99926-9670", emailSupervisorVivo: "claudio.liberalesso@telefonica.com", coordenadorVivo: "Marcos Vinicius Xavier Dutra (51) 99953-6675", emailCoordenadorVivo: "marcos.dutra@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Ivotí", uf: "RS", sigla: "IVI", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", supervisorVivo: "Marcio Andre Da Rosa Mendes (51) 99589-2075", emailSupervisorVivo: "marcio.amendes@telefonica.com", coordenadorVivo: "João Andrioli (41) 99244-9441", emailCoordenadorVivo: "joao.cferreira@telefonica.com", gerenteVivo: "Michel Romanini (44) 98455-2705", emailGerenteVivo: "juan.romanini@telefonica.com" },
+    { municipio: "Lagoa Vermelha", uf: "RS", sigla: "LVH", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Cassio Fernando Rocha Oliveira (54) 99608-4221", emailSupervisorVivo: "cassio.oliveira@telefonica.com", coordenadorVivo: "Jeferson Gardino (47) 99201-2274", emailCoordenadorVivo: "jeferson.gardino@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Lajeado", uf: "RS", sigla: "LJO", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Diego Dos Santos Machado (51) 99872-6541", emailSupervisorVivo: "diego.machado@telefonica.com", coordenadorVivo: "Jeferson Gardino (47) 99201-2274", emailCoordenadorVivo: "jeferson.gardino@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Nova Petrópolis", uf: "RS", sigla: "NVP", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", supervisorVivo: "Diego Dos Santos Machado (51) 99872-6541", emailSupervisorVivo: "diego.machado@telefonica.com", coordenadorVivo: "Jeferson Gardino (47) 99201-2274", emailCoordenadorVivo: "jeferson.gardino@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Osório", uf: "RS", sigla: "OSR", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", supervisorVivo: "Anderson Andrade Marins (51) 99779-1640", emailSupervisorVivo: "anderson.marins@telefonica.com", coordenadorVivo: "João Andrioli (41) 99244-9441", emailCoordenadorVivo: "joao.cferreira@telefonica.com", gerenteVivo: "Michel Romanini (44) 98455-2705", emailGerenteVivo: "juan.romanini@telefonica.com" },
+    { municipio: "Palmeira Das Missões", uf: "RS", sigla: "PMM", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Claudio Soares Liberalesso (54) 99926-9670", emailSupervisorVivo: "claudio.liberalesso@telefonica.com", coordenadorVivo: "Marcos Vinicius Xavier Dutra (51) 99953-6675", emailCoordenadorVivo: "marcos.dutra@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Santa Rosa", uf: "RS", sigla: "SRO", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", supervisorVivo: "Claudio Soares Liberalesso (54) 99926-9670", emailSupervisorVivo: "claudio.liberalesso@telefonica.com", coordenadorVivo: "Marcos Vinicius Xavier Dutra (51) 99953-6675", emailCoordenadorVivo: "marcos.dutra@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Sant'Ana Do Livramento", uf: "RS", sigla: "SIV", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Claudio Soares Liberalesso (54) 99926-9670", emailSupervisorVivo: "claudio.liberalesso@telefonica.com", coordenadorVivo: "Marcos Vinicius Xavier Dutra (51) 99953-6675", emailCoordenadorVivo: "marcos.dutra@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Santo Ângelo", uf: "RS", sigla: "SAN", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", supervisorVivo: "Claudio Soares Liberalesso (54) 99926-9670", emailSupervisorVivo: "claudio.liberalesso@telefonica.com", coordenadorVivo: "Marcos Vinicius Xavier Dutra (51) 99953-6675", emailCoordenadorVivo: "marcos.dutra@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "São Marcos", uf: "RS", sigla: "SCS", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", supervisorVivo: "Anderson De Lima Velho (54) 99707-3335", emailSupervisorVivo: "anderson.velho@telefonica.com", coordenadorVivo: "Jeferson Gardino (47) 99201-2274", emailCoordenadorVivo: "jeferson.gardino@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Sarandi", uf: "RS", sigla: "SRD", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Cassio Fernando Rocha Oliveira (54) 99608-4221", emailSupervisorVivo: "cassio.oliveira@telefonica.com", coordenadorVivo: "Jeferson Gardino (47) 99201-2274", emailCoordenadorVivo: "jeferson.gardino@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Taquara", uf: "RS", sigla: "TQR", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", supervisorVivo: "Marcio Andre Da Rosa Mendes (51) 99589-2075", emailSupervisorVivo: "marcio.amendes@telefonica.com", coordenadorVivo: "João Andrioli (41) 99244-9441", emailCoordenadorVivo: "joao.cferreira@telefonica.com", gerenteVivo: "Michel Romanini (44) 98455-2705", emailGerenteVivo: "juan.romanini@telefonica.com" },
+    { municipio: "Teutônia", uf: "RS", sigla: "TUN", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Diego Dos Santos Machado (51) 99872-6541", emailSupervisorVivo: "diego.machado@telefonica.com", coordenadorVivo: "Jeferson Gardino (47) 99201-2274", emailCoordenadorVivo: "jeferson.gardino@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Torres", uf: "RS", sigla: "TES", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", supervisorVivo: "Anderson Andrade Marins (51) 99779-1640", emailSupervisorVivo: "anderson.marins@telefonica.com", coordenadorVivo: "João Andrioli (41) 99244-9441", emailCoordenadorVivo: "joao.cferreira@telefonica.com", gerenteVivo: "Michel Romanini (44) 98455-2705", emailGerenteVivo: "juan.romanini@telefonica.com" },
+    { municipio: "Tramandaí", uf: "RS", sigla: "TRI", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", supervisorVivo: "Anderson Andrade Marins (51) 99779-1640", emailSupervisorVivo: "anderson.marins@telefonica.com", coordenadorVivo: "João Andrioli (41) 99244-9441", emailCoordenadorVivo: "joao.cferreira@telefonica.com", gerenteVivo: "Michel Romanini (44) 98455-2705", emailGerenteVivo: "juan.romanini@telefonica.com" },
+    { municipio: "Três De Maio", uf: "RS", sigla: "TMI", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", supervisorVivo: "Claudio Soares Liberalesso (54) 99926-9670", emailSupervisorVivo: "claudio.liberalesso@telefonica.com", coordenadorVivo: "Marcos Vinicius Xavier Dutra (51) 99953-6675", emailCoordenadorVivo: "marcos.dutra@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Uruguaiana", uf: "RS", sigla: "UGN", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Claudio Soares Liberalesso (54) 99926-9670", emailSupervisorVivo: "claudio.liberalesso@telefonica.com", coordenadorVivo: "Marcos Vinicius Xavier Dutra (51) 99953-6675", emailCoordenadorVivo: "marcos.dutra@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Vacaria", uf: "RS", sigla: "VAA", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Cassio Fernando Rocha Oliveira (54) 99608-4221", emailSupervisorVivo: "cassio.oliveira@telefonica.com", coordenadorVivo: "Jeferson Gardino (47) 99201-2274", emailCoordenadorVivo: "jeferson.gardino@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Venâncio Aires", uf: "RS", sigla: "VAI", fila: "PLANTA EXTERNA N1 / RS 2", eps: "Razao Info", supervisorVivo: "Claudio Soares Liberalesso (54) 99926-9670", emailSupervisorVivo: "claudio.liberalesso@telefonica.com", coordenadorVivo: "Marcos Vinicius Xavier Dutra (51) 99953-6675", emailCoordenadorVivo: "marcos.dutra@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Veranópolis", uf: "RS", sigla: "VNS", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", supervisorVivo: "Diego Dos Santos Machado (51) 99872-6541", emailSupervisorVivo: "diego.machado@telefonica.com", coordenadorVivo: "Jeferson Gardino (47) 99201-2274", emailCoordenadorVivo: "jeferson.gardino@telefonica.com", gerenteVivo: "Maxchel Joner Da Silva (51) 98120-9962", emailGerenteVivo: "maxchel.silva@telefonica.com" },
+    { municipio: "Xangri-Lá", uf: "RS", sigla: "XNLA", fila: "PLANTA EXTERNA N1 / RS 1", eps: "Razao Info", supervisorVivo: "Anderson Andrade Marins (51) 99779-1640", emailSupervisorVivo: "anderson.marins@telefonica.com", coordenadorVivo: "João Andrioli (41) 99244-9441", emailCoordenadorVivo: "joao.cferreira@telefonica.com", gerenteVivo: "Michel Romanini (44) 98455-2705", emailGerenteVivo: "juan.romanini@telefonica.com" },
+    { municipio: "Cabedelo", uf: "PB", sigla: "CBD", fila: "PLANTA EXTERNA N1 / PB", eps: "TECNOMULTI", supervisorVivo: "Samuel Costa (11) 94323-7772", emailSupervisorVivo: "samueld.costa@telefonica.com", coordenadorVivo: "Fred Oliveira (81) 99229-4398", emailCoordenadorVivo: "fred.silva@telefonica.com", gerenteVivo: "Cristian Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Patos", uf: "PB", sigla: "POS", fila: "PLANTA EXTERNA N1 / PB", eps: "TECNOMULTI", supervisorVivo: "Samuel Costa (11) 94323-7772", emailSupervisorVivo: "samueld.costa@telefonica.com", coordenadorVivo: "Fred Oliveira (81) 99229-4399", emailCoordenadorVivo: "fred.silva@telefonica.com", gerenteVivo: "Cristian Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Garanhuns", uf: "PE", sigla: "GUS", fila: "PLANTA EXTERNA N1 / PE 2", eps: "TECNOMULTI", supervisorVivo: "Samuel Costa (11) 94323-7772", emailSupervisorVivo: "samueld.costa@telefonica.com", coordenadorVivo: "Fred Oliveira (81) 99229-4398", emailCoordenadorVivo: "fred.silva@telefonica.com", gerenteVivo: "Cristian Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Mossoró", uf: "RN", sigla: "MRO", fila: "PLANTA EXTERNA N1 / RN", eps: "TECNOMULTI", supervisorVivo: "Douglas Dos Reis Mata (86) 98106-6049", emailSupervisorVivo: "douglasd.mata@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Parnamirim", uf: "RN", sigla: "PWM", fila: "PLANTA EXTERNA N1 / RN", eps: "TECNOMULTI", supervisorVivo: "Douglas Dos Reis Mata (86) 98106-6049", emailSupervisorVivo: "douglasd.mata@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Nova Lima", uf: "MG", sigla: "NLA", fila: "PLANTA EXTERNA N1 / MG 5", eps: "TELEMONT", supervisorVivo: "Jair Rosa De Melo (31) 99955-7573", emailSupervisorVivo: "jair.melo@telefonica.com", coordenadorVivo: "Juliano Nunes De Oliveira (31) 99591-9305", emailCoordenadorVivo: "juliano.noliveira@telefonica.com", gerenteVivo: "Bruno Junqueira Leitao De Almeida (31) 99910-2830", emailGerenteVivo: "bruno.jalmeida@telefonica.com" },
+    { municipio: "Capinzal", uf: "SC", sigla: "CNZ", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", supervisorVivo: "Alex Facci (49) 99104-3551", emailSupervisorVivo: "alex.ribeiro@telefonica.com", coordenadorVivo: "Fábio Ferreira De Oliveira (48) 99111-9942", emailCoordenadorVivo: "fabio.foliveira@telefonica.com", gerenteVivo: "Elise Zerwes (48) 99248-0760", emailGerenteVivo: "elise.zerwes@telefonica.com" },
+    { municipio: "Concórdia", uf: "SC", sigla: "CDA", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", supervisorVivo: "Alex Facci (49) 99104-3551", emailSupervisorVivo: "alex.ribeiro@telefonica.com", coordenadorVivo: "Fábio Ferreira De Oliveira (48) 99111-9942", emailCoordenadorVivo: "fabio.foliveira@telefonica.com", gerenteVivo: "Elise Zerwes (48) 99248-0760", emailGerenteVivo: "elise.zerwes@telefonica.com" },
+    { municipio: "Fraiburgo", uf: "SC", sigla: "FGO", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", supervisorVivo: "Alex Facci (49) 99104-3551", emailSupervisorVivo: "alex.ribeiro@telefonica.com", coordenadorVivo: "Fábio Ferreira De Oliveira (48) 99111-9942", emailCoordenadorVivo: "fabio.foliveira@telefonica.com", gerenteVivo: "Elise Zerwes (48) 99248-0760", emailGerenteVivo: "elise.zerwes@telefonica.com" },
+    { municipio: "Garopaba", uf: "SC", sigla: "GRB", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", supervisorVivo: "Assis Gilberto Oribe (48) 99113-7843", emailSupervisorVivo: "assis.santos@telefonica.com", coordenadorVivo: "Fábio Ferreira De Oliveira (48) 99111-9942", emailCoordenadorVivo: "fabio.foliveira@telefonica.com", gerenteVivo: "Elise Zerwes (48) 99248-0760", emailGerenteVivo: "elise.zerwes@telefonica.com" },
+    { municipio: "Imbituba", uf: "SC", sigla: "IMA", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", supervisorVivo: "Assis Gilberto Oribe (48) 99113-7843", emailSupervisorVivo: "assis.santos@telefonica.com", coordenadorVivo: "Fábio Ferreira De Oliveira (48) 99111-9942", emailCoordenadorVivo: "fabio.foliveira@telefonica.com", gerenteVivo: "Elise Zerwes (48) 99248-0760", emailGerenteVivo: "elise.zerwes@telefonica.com" },
+    { municipio: "Mafra", uf: "SC", sigla: "MFA", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", supervisorVivo: "Edinilson Matias (47) 99190-4626", emailSupervisorVivo: "edmlson.silva@telefonica.com", coordenadorVivo: "Fábio Ferreira De Oliveira (48) 99111-9942", emailCoordenadorVivo: "fabio.foliveira@telefonica.com", gerenteVivo: "Elise Zerwes (48) 99248-0760", emailGerenteVivo: "elise.zerwes@telefonica.com" },
+    { municipio: "Navegantes", uf: "SC", sigla: "NVG", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", supervisorVivo: "Cledson Rogerio (47) 99197-3303", emailSupervisorVivo: "cledson.roehrs@telefonica.com", coordenadorVivo: "Fábio Ferreira De Oliveira (48) 99111-9942", emailCoordenadorVivo: "fabio.foliveira@telefonica.com", gerenteVivo: "Elise Zerwes (48) 99248-0760", emailGerenteVivo: "elise.zerwes@telefonica.com" },
+    { municipio: "Pomerode", uf: "SC", sigla: "POD", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", supervisorVivo: "Cledson Rogerio (47) 99197-3303", emailSupervisorVivo: "cledson.roehrs@telefonica.com", coordenadorVivo: "Fábio Ferreira De Oliveira (48) 99111-9942", emailCoordenadorVivo: "fabio.foliveira@telefonica.com", gerenteVivo: "Elise Zerwes (48) 99248-0760", emailGerenteVivo: "elise.zerwes@telefonica.com" },
+    { municipio: "Rio Do Sul", uf: "SC", sigla: "RSL", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", supervisorVivo: "Cledson Rogerio (47) 99197-3303", emailSupervisorVivo: "cledson.roehrs@telefonica.com", coordenadorVivo: "Fábio Ferreira De Oliveira (48) 99111-9942", emailCoordenadorVivo: "fabio.foliveira@telefonica.com", gerenteVivo: "Elise Zerwes (48) 99248-0760", emailGerenteVivo: "elise.zerwes@telefonica.com" },
+    { municipio: "São Bento Do Sul", uf: "SC", sigla: "SBS", fila: "PLANTA EXTERNA N1 / SC 1", eps: "TLP", supervisorVivo: "Edinilson Matias (47) 99190-4626", emailSupervisorVivo: "edmlson.silva@telefonica.com", coordenadorVivo: "Fábio Ferreira De Oliveira (48) 99111-9942", emailCoordenadorVivo: "fabio.foliveira@telefonica.com", gerenteVivo: "Elise Zerwes (48) 99248-0760", emailGerenteVivo: "elise.zerwes@telefonica.com" },
+    { municipio: "Picos", uf: "PI", sigla: "PCZ", fila: "PLANTA EXTERNA N1 / PI 2", eps: "VIRTEX", supervisorVivo: "Douglas Dos Reis Mata (86) 98106-6049", emailSupervisorVivo: "douglasd.mata@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" },
+    { municipio: "Teresina", uf: "PI", sigla: "TSA", fila: "PLANTA EXTERNA N1 / PI 2", eps: "VIRTEX", supervisorVivo: "Douglas Dos Reis Mata (86) 98106-6049", emailSupervisorVivo: "douglasd.mata@telefonica.com", coordenadorVivo: "Jose Do Prado Barreto Neto (71) 99980-2017", emailCoordenadorVivo: "jose.neto3@telefonica.com", gerenteVivo: "Cristian Natalino Carvalho (85) 99112-2895", emailGerenteVivo: "cristian.carvalho@telefonica.com" }
 ];
 
-    // Função para limpar, deduplicar e enriquecer os dados da VIVO
-    const processarDadosVivo = () => {
-        // 1. Deduplicar usando um Map com chave "municipio-uf"
-        const uniqueVivoMap = new Map();
-        escalonamentoCompleto.forEach(item => {
-            const key = `${item.municipio.toUpperCase().trim()}-${item.uf.toUpperCase().trim()}`;
-            if (!uniqueVivoMap.has(key)) {
-                uniqueVivoMap.set(key, item);
+    const escalonamentoCompleto = escalonamentoVivo;
+
+    // Extração e normalização de telefones
+    const extractPhones = (text) => {
+        if (!text) return [];
+        const regex = /(?:\(?\d{2}\)?\s*)?(?:9\s*)?\d{4,5}[-\s]?\d{4}/g;
+        const matches = text.match(regex) || [];
+        return matches.map(m => m.trim()).filter(m => m.replace(/\D/g, '').length >= 8);
+    };
+
+    const extractEmails = (text) => {
+        if (!text) return [];
+        const regex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+        return text.match(regex) || [];
+    };
+
+    // Formatação de telefone adicionando 0 no DDD (Exemplo: 098, 011)
+    const formatPhoneWithZeroDDD = (rawPhone) => {
+        if (!rawPhone || !rawPhone.trim() || rawPhone.toLowerCase().includes('sem contato')) {
+            return 'sem contato';
+        }
+        const rawParts = rawPhone.split(/\s*[\/,]\s*/);
+        const formattedParts = rawParts.map(part => {
+            let digits = part.replace(/\D/g, '');
+            if (!digits || digits.length < 8) return part.trim();
+
+            // Remove código de país 55 se vier com 12 ou 13 dígitos
+            if ((digits.length === 12 || digits.length === 13) && digits.startsWith('55')) {
+                digits = digits.substring(2);
             }
+            // Remove zero inicial se já existir antes de adicionar o formato padronizado
+            if (digits.startsWith('0')) {
+                digits = digits.substring(1);
+            }
+
+            if (digits.length === 11) { // DDD 2 dígitos + 9 celular
+                const ddd = '0' + digits.substring(0, 2);
+                const p1 = digits.substring(2, 7);
+                const p2 = digits.substring(7);
+                return `${ddd} ${p1}-${p2}`;
+            } else if (digits.length === 10) { // DDD 2 dígitos + 8 fixo
+                const ddd = '0' + digits.substring(0, 2);
+                const p1 = digits.substring(2, 6);
+                const p2 = digits.substring(6);
+                return `${ddd} ${p1}-${p2}`;
+            } else if (digits.length === 9) {
+                return `${digits.substring(0, 5)}-${digits.substring(5)}`;
+            } else if (digits.length === 8) {
+                return `${digits.substring(0, 4)}-${digits.substring(4)}`;
+            }
+            return part.trim();
         });
-        const dedupedVivo = Array.from(uniqueVivoMap.values());
+        return formattedParts.join(' / ');
+    };
 
-        // 2. Enriquecer os dados da VIVO com informações da FIBRASIL
-        return dedupedVivo.map(vivoItem => {
-            const match = baseDadosFibra.find(fibraItem => 
-                fibraItem.municipio.toUpperCase().trim() === vivoItem.municipio.toUpperCase().trim() &&
-                fibraItem.uf.toUpperCase().trim() === vivoItem.uf.toUpperCase().trim()
-            );
+    // Parser universal de contatos estruturado em Diurno e Noturno com DDD 0 e E-mail
+    const parseContact = (raw, explicitEmail = '') => {
+        let res = {
+            diurno: { nome: 'sem contato', telefone: 'sem contato', email: 'sem e-mail' },
+            noturno: { nome: 'sem contato', telefone: 'sem contato', email: 'sem e-mail' }
+        };
 
-            if (match) {
-                return {
-                    ...vivoItem,
-                    fila: match.fila || vivoItem.fila || 'Não informado',
-                    eps: match.eps || vivoItem.eps || 'Não informado',
-                    sigla: match.sigla || vivoItem.sigla || 'N/A'
+        const explicitEmails = extractEmails(explicitEmail || '');
+
+        if (!raw || !raw.trim()) {
+            if (explicitEmails.length >= 2) {
+                res.diurno.email = explicitEmails[0];
+                res.noturno.email = explicitEmails[1];
+            } else if (explicitEmails.length === 1) {
+                res.diurno.email = explicitEmails[0];
+                res.noturno.email = explicitEmails[0];
+            }
+            return res;
+        }
+
+        let text = raw.trim().replace(/Diruno/gi, 'Diurno');
+        const textEmails = extractEmails(text);
+        const emails = explicitEmails.length > 0 ? explicitEmails : textEmails;
+
+        // Padrão 1: Contém Diurno e Noturno explícitos
+        if (/Diurno\s*:/i.test(text) && /Noturno\s*:/i.test(text) && !/Diurno\s*\/\s*Noturno/i.test(text)) {
+            const parts = text.split(/(?=Diurno\s*:)/i).filter(p => p.trim());
+            if (parts.length >= 2) {
+                const namePart = parts[0];
+                const phonePart = parts[1];
+
+                const nameDMatch = namePart.match(/Diurno\s*:\s*([^/]*?)(?:\s*\/\s*Noturno|$)/i);
+                const nameNMatch = namePart.match(/Noturno\s*:\s*(.*)$/i);
+
+                const phoneDMatch = phonePart.match(/Diurno\s*:\s*([^/]*?)(?:\s*\/\s*Noturno|$)/i);
+                const phoneNMatch = phonePart.match(/Noturno\s*:\s*(.*)$/i);
+
+                let dNome = nameDMatch ? nameDMatch[1].trim() : '';
+                let nNome = nameNMatch ? nameNMatch[1].trim() : '';
+                let dTel = phoneDMatch ? phoneDMatch[1].trim() : '';
+                let nTel = phoneNMatch ? phoneNMatch[1].trim() : '';
+
+                extractEmails(dNome + ' ' + dTel).forEach(em => { dNome = dNome.replace(em, ''); dTel = dTel.replace(em, ''); });
+                extractEmails(nNome + ' ' + nTel).forEach(em => { nNome = nNome.replace(em, ''); nTel = nTel.replace(em, ''); });
+
+                if (extractPhones(dNome).length > 0 && !dTel) { dTel = dNome; dNome = ''; }
+                if (extractPhones(nNome).length > 0 && !nTel) { nTel = nNome; nNome = ''; }
+
+                const dPhoneClean = extractPhones(dTel)[0] || dTel;
+                const nPhoneClean = extractPhones(nTel)[0] || nTel;
+
+                res = {
+                    diurno: {
+                        nome: dNome.trim() || (dPhoneClean ? 'Plantão Diurno' : 'sem contato'),
+                        telefone: formatPhoneWithZeroDDD(dPhoneClean),
+                        email: emails[0] || 'sem e-mail'
+                    },
+                    noturno: {
+                        nome: nNome.trim() || (nPhoneClean ? 'Plantão Noturno' : 'sem contato'),
+                        telefone: formatPhoneWithZeroDDD(nPhoneClean),
+                        email: emails[1] || emails[0] || 'sem e-mail'
+                    }
+                };
+            } else {
+                const dMatch = text.match(/Diurno\s*:\s*([^/]*?)(?:\s*\/\s*Noturno\s*:|$)/i);
+                const nMatch = text.match(/Noturno\s*:\s*(.*)$/i);
+
+                const dText = dMatch ? dMatch[1].trim() : '';
+                const nText = nMatch ? nMatch[1].trim() : '';
+
+                const dPhones = extractPhones(dText);
+                const nPhones = extractPhones(nText);
+
+                let dNome = dText;
+                extractEmails(dNome).forEach(em => { dNome = dNome.replace(em, ''); });
+                if (dPhones.length) dNome = dNome.replace(dPhones[0], '');
+                dNome = dNome.replace(/\(|\)/g, '').trim();
+
+                let nNome = nText;
+                extractEmails(nNome).forEach(em => { nNome = nNome.replace(em, ''); });
+                if (nPhones.length) nNome = nNome.replace(nPhones[0], '');
+                nNome = nNome.replace(/\(|\)/g, '').trim();
+
+                res = {
+                    diurno: {
+                        nome: dNome || (dPhones[0] ? 'Plantão Diurno' : 'sem contato'),
+                        telefone: formatPhoneWithZeroDDD(dPhones[0] || ''),
+                        email: emails[0] || 'sem e-mail'
+                    },
+                    noturno: {
+                        nome: nNome || (nPhones[0] ? 'Plantão Noturno' : 'sem contato'),
+                        telefone: formatPhoneWithZeroDDD(nPhones[0] || ''),
+                        email: emails[1] || emails[0] || 'sem e-mail'
+                    }
                 };
             }
-            return vivoItem; // Retorna o item original se não houver correspondência
-        });
-    };
+        } else if (/Diurno\s*\/\s*Noturno/i.test(text)) {
+            // Padrão 2: Diurno/Noturno compartilhado
+            const cleaned = text.replace(/Diurno\s*\/\s*Noturno\s*:?\s*/gi, ' ').trim();
+            const phones = extractPhones(cleaned);
+            let nome = cleaned;
+            extractEmails(cleaned).forEach(em => { nome = nome.replace(em, ''); });
+            phones.forEach(p => { nome = nome.replace(p, ''); });
+            nome = nome.replace(/\(|\)/g, '').replace(/Diurno\s*\/\s*Noturno\s*:?/gi, '').trim();
 
-    let escalaVivoProcessada = processarDadosVivo();
+            const telStr = formatPhoneWithZeroDDD(phones[0] || '');
+            const nomeStr = nome || (telStr !== 'sem contato' ? 'Plantão Geral' : 'sem contato');
+            const emailStr = emails[0] || 'sem e-mail';
 
-    let activeAgenteSource = null;
-
-    const openAgenteRapidoModal = (event) => {
-        if (event) event.preventDefault();
-        modal.style.display = 'block';
-        const searchContainer = document.getElementById('agente-search-container');
-        searchContainer.style.maxHeight = '0px';
-        document.getElementById('btn-agente-fibrasil').classList.remove('active');
-        document.getElementById('btn-agente-vivo').classList.remove('active');
-        activeAgenteSource = null;
-        document.getElementById('agente-search-input').value = '';
-        document.getElementById('agente-search-results').innerHTML = '';
-        setTimeout(() => document.getElementById('agente-search-input').focus(), 100);
-    };
-
-    const closeAgenteRapidoModal = () => {
-        modal.style.display = 'none';
-    };
-
-    const setAgenteSource = (source) => {
-        const searchContainer = document.getElementById('agente-search-container');
-        const titleEl = document.getElementById('agente-search-title');
-        const btnFibrasil = document.getElementById('btn-agente-fibrasil');
-        const btnVivo = document.getElementById('btn-agente-vivo');
-
-        if (activeAgenteSource === source) {
-            activeAgenteSource = null;
-            searchContainer.style.maxHeight = '0px';
-            btnFibrasil.classList.remove('active');
-            btnVivo.classList.remove('active');
+            res = {
+                diurno: { nome: nomeStr, telefone: telStr, email: emailStr },
+                noturno: { nome: nomeStr, telefone: telStr, email: emailStr }
+            };
         } else {
-            activeAgenteSource = source;
-            searchContainer.style.maxHeight = '500px';
-            document.getElementById('agente-search-input').value = '';
-            document.getElementById('agente-search-results').innerHTML = '';
-            titleEl.textContent = source === 'fibrasil' ? "Escalonamento por Cidades/SIGLAS" : "Escalonamento VIVO";
-            btnFibrasil.classList.toggle('active', source === 'fibrasil');
-            btnVivo.classList.toggle('active', source === 'vivo');
+            // Padrão 3: Parser Geral com suporte a múltiplos contatos (1º Nome = 1º Telefone, 2º Nome = 2º Telefone)
+            const allPhones = extractPhones(text);
+
+            let textWithoutEmails = text;
+            extractEmails(text).forEach(em => { textWithoutEmails = textWithoutEmails.replace(em, ''); });
+
+            if (allPhones.length >= 2) {
+                let textWithoutPhones = textWithoutEmails;
+                allPhones.forEach(p => {
+                    textWithoutPhones = textWithoutPhones.replace(p, '');
+                });
+                textWithoutPhones = textWithoutPhones.replace(/[\(\)]/g, ' ').replace(/\s+-\s+/g, '/').replace(/\s+/g, ' ').trim();
+
+                const nameParts = textWithoutPhones.split('/').map(n => n.trim()).filter(n => n.length > 0);
+
+                let dNome = nameParts[0] || 'Responsável Diurno';
+                let nNome = nameParts[1] || nameParts[0] || 'Responsável Noturno';
+                let dPhone = allPhones[0] || '';
+                let nPhone = allPhones[1] || allPhones[0] || '';
+
+                res = {
+                    diurno: {
+                        nome: dNome,
+                        telefone: formatPhoneWithZeroDDD(dPhone),
+                        email: emails[0] || 'sem e-mail'
+                    },
+                    noturno: {
+                        nome: nNome,
+                        telefone: formatPhoneWithZeroDDD(nPhone),
+                        email: emails[1] || emails[0] || 'sem e-mail'
+                    }
+                };
+            } else if (allPhones.length === 1) {
+                let textWithoutPhones = textWithoutEmails.replace(allPhones[0], '').replace(/[\(\)]/g, ' ').trim();
+                const nameParts = textWithoutPhones.split('/').map(n => n.trim()).filter(n => n.length > 0);
+
+                if (nameParts.length >= 2) {
+                    res = {
+                        diurno: {
+                            nome: nameParts[0],
+                            telefone: formatPhoneWithZeroDDD(allPhones[0]),
+                            email: emails[0] || 'sem e-mail'
+                        },
+                        noturno: {
+                            nome: nameParts[1],
+                            telefone: formatPhoneWithZeroDDD(allPhones[0]),
+                            email: emails[1] || emails[0] || 'sem e-mail'
+                        }
+                    };
+                } else {
+                    const nome = nameParts[0] || 'Responsável';
+                    res = {
+                        diurno: {
+                            nome: nome,
+                            telefone: formatPhoneWithZeroDDD(allPhones[0]),
+                            email: emails[0] || 'sem e-mail'
+                        },
+                        noturno: {
+                            nome: nome,
+                            telefone: formatPhoneWithZeroDDD(allPhones[0]),
+                            email: emails[0] || 'sem e-mail'
+                        }
+                    };
+                }
+            } else {
+                const nameParts = textWithoutEmails.split('/').map(n => n.trim()).filter(n => n.length > 0);
+                const dNome = nameParts[0] || 'sem contato';
+                const nNome = nameParts[1] || dNome;
+
+                res = {
+                    diurno: {
+                        nome: dNome,
+                        telefone: 'sem contato',
+                        email: emails[0] || 'sem e-mail'
+                    },
+                    noturno: {
+                        nome: nNome,
+                        telefone: 'sem contato',
+                        email: emails[1] || emails[0] || 'sem e-mail'
+                    }
+                };
+            }
+        }
+
+        // Aplicação de explicitEmail garantindo ordenação correta
+        if (explicitEmails.length >= 2) {
+            res.diurno.email = explicitEmails[0];
+            res.noturno.email = explicitEmails[1];
+        } else if (explicitEmails.length === 1) {
+            res.diurno.email = explicitEmails[0];
+            if (!res.noturno.email || res.noturno.email === 'sem e-mail') {
+                res.noturno.email = explicitEmails[0];
+            }
+        }
+
+        return res;
+    };
+
+    // Unificação das bases EPS e VIVO por Município e UF
+    const buildUnifiedCities = () => {
+        const normalizeKey = (mun, uf) => {
+            return (mun || '').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') + '-' + (uf || '').trim().toUpperCase();
+        };
+
+        const cityMap = new Map();
+
+        // 1. Adicionar dados de EPS
+        escalonamentoEPS.forEach(item => {
+            const key = normalizeKey(item.municipio, item.uf);
+            cityMap.set(key, {
+                municipio: item.municipio,
+                uf: item.uf,
+                sigla: item.sigla || 'N/A',
+                fila: item.fila || '',
+                eps: item.eps || '',
+                status: item.status || '',
+                epsData: item,
+                vivoData: null
+            });
+        });
+
+        // 2. Mesclar dados de VIVO
+        escalonamentoVivo.forEach(item => {
+            const key = normalizeKey(item.municipio, item.uf);
+            if (cityMap.has(key)) {
+                const existing = cityMap.get(key);
+                existing.vivoData = item;
+                if (!existing.sigla || existing.sigla === 'N/A') existing.sigla = item.sigla || 'N/A';
+                if (!existing.fila) existing.fila = item.fila || '';
+                if (!existing.eps) existing.eps = item.eps || '';
+            } else {
+                cityMap.set(key, {
+                    municipio: item.municipio,
+                    uf: item.uf,
+                    sigla: item.sigla || 'N/A',
+                    fila: item.fila || '',
+                    eps: item.eps || '',
+                    status: item.status || '',
+                    epsData: null,
+                    vivoData: item
+                });
+            }
+        });
+
+        return Array.from(cityMap.values()).sort((a, b) => a.municipio.localeCompare(b.municipio));
+    };
+
+    let unifiedCities = buildUnifiedCities();
+
+    const copyPhoneToClipboard = async (phone, element) => {
+        if (!phone) return;
+        try {
+            const cleanText = phone.trim();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(cleanText);
+            } else {
+                const tempInput = document.createElement('textarea');
+                tempInput.value = cleanText;
+                tempInput.style.position = 'fixed';
+                tempInput.style.opacity = '0';
+                document.body.appendChild(tempInput);
+                tempInput.focus();
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+            }
+            const originalHTML = element.innerHTML;
+            element.innerHTML = '<i class="fas fa-check"></i>';
+            element.style.color = '#22c55e';
+            setTimeout(() => {
+                element.innerHTML = originalHTML;
+                element.style.color = '';
+            }, 1500);
+        } catch (err) {
+            console.error('Erro ao copiar telefone/email:', err);
         }
     };
 
-    const searchAgente = (e) => {
-        const term = e.target.value.toLowerCase();
-        const resultsContainer = document.getElementById('agente-search-results');
-        resultsContainer.innerHTML = '';
+    const renderContactBlock = (roleTitle, iconClass, rawData, isVivo = false, explicitEmail = '') => {
+        const parsed = parseContact(rawData, explicitEmail);
 
-        if (term.length < 2 || !activeAgenteSource) return;
-
-        const sourceData = activeAgenteSource === 'fibrasil' ? baseDadosFibra : escalaVivoProcessada;
-        const filtered = sourceData.filter(item =>
-            Object.values(item).some(value => 
-                String(value).toLowerCase().includes(term)
-            )
-            // item.municipio.toLowerCase().includes(term) ||
-            // (item.sigla && item.sigla.toLowerCase().includes(term)) ||
-            // (item.supervisor && item.supervisor.toLowerCase().includes(term)) ||
-            // (item.coordenador && item.coordenador.toLowerCase().includes(term)) ||
-            // (item.uf && item.uf.toLowerCase().includes(term))
+        const isSameContact = (
+            parsed.diurno.nome.trim().toLowerCase() === parsed.noturno.nome.trim().toLowerCase() &&
+            parsed.diurno.telefone.trim() === parsed.noturno.telefone.trim() &&
+            parsed.diurno.email.trim().toLowerCase() === parsed.noturno.email.trim().toLowerCase()
         );
 
-        if (filtered.length === 0) {
-            resultsContainer.innerHTML = '<p style="text-align: center; opacity: 0.7; margin-top: 20px;">Nenhum resultado encontrado.</p>';
+        if (isSameContact) {
+            const hasPhone = parsed.diurno.telefone && parsed.diurno.telefone !== 'sem contato';
+            const hasEmail = parsed.diurno.email && parsed.diurno.email !== 'sem e-mail';
+
+            const copyBtnPhone = hasPhone
+                ? `<button class="copy-phone-btn" data-phone="${parsed.diurno.telefone}" title="Copiar telefone (${parsed.diurno.telefone})"><i class="fas fa-copy"></i></button>`
+                : '';
+
+            const copyBtnEmail = hasEmail
+                ? `<button class="copy-phone-btn copy-email-btn" data-phone="${parsed.diurno.email}" title="Copiar e-mail (${parsed.diurno.email})"><i class="fas fa-copy"></i></button>`
+                : '';
+
+            return `
+                <div class="agente-role-block">
+                    <div class="contact-3col-row unico">
+                        <div class="contact-col-role">
+                            <div class="contact-role-title"><i class="${iconClass}"></i> ${roleTitle}:</div>
+                            <div class="contact-shift-wrap">
+                                <span class="shift-tag shift-geral" title="Atendimento Diurno e Noturno"><i class="fas fa-sun"></i><i class="fas fa-moon"></i> Diurno / Noturno</span>
+                            </div>
+                        </div>
+                        <div class="contact-col-person">
+                            <span class="contact-name-value ${parsed.diurno.nome === 'sem contato' ? 'sem-contato' : ''}">${parsed.diurno.nome}</span>
+                            <div class="contact-email-row">
+                                <span class="contact-email-value ${hasEmail ? '' : 'sem-contato'}"><i class="fas fa-envelope"></i> ${hasEmail ? parsed.diurno.email : '...'}</span>
+                                ${copyBtnEmail}
+                            </div>
+                        </div>
+                        <div class="contact-col-phone">
+                            <div class="contact-tel-row">
+                                <span class="contact-tel-value ${parsed.diurno.telefone === 'sem contato' ? 'sem-contato' : ''}">${parsed.diurno.telefone}</span>
+                                ${copyBtnPhone}
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        const hasDiurnoPhone = parsed.diurno.telefone && parsed.diurno.telefone !== 'sem contato';
+        const hasNoturnoPhone = parsed.noturno.telefone && parsed.noturno.telefone !== 'sem contato';
+
+        const copyBtnDiurno = hasDiurnoPhone
+            ? `<button class="copy-phone-btn" data-phone="${parsed.diurno.telefone}" title="Copiar telefone (${parsed.diurno.telefone})"><i class="fas fa-copy"></i></button>`
+            : '';
+
+        const copyBtnNoturno = hasNoturnoPhone
+            ? `<button class="copy-phone-btn" data-phone="${parsed.noturno.telefone}" title="Copiar telefone (${parsed.noturno.telefone})"><i class="fas fa-copy"></i></button>`
+            : '';
+
+        const hasDiurnoEmail = parsed.diurno.email && parsed.diurno.email !== 'sem e-mail';
+        const hasNoturnoEmail = parsed.noturno.email && parsed.noturno.email !== 'sem e-mail';
+
+        const copyBtnEmailDiurno = hasDiurnoEmail
+            ? `<button class="copy-phone-btn copy-email-btn" data-phone="${parsed.diurno.email}" title="Copiar e-mail (${parsed.diurno.email})"><i class="fas fa-copy"></i></button>`
+            : '';
+
+        const copyBtnEmailNoturno = hasNoturnoEmail
+            ? `<button class="copy-phone-btn copy-email-btn" data-phone="${parsed.noturno.email}" title="Copiar e-mail (${parsed.noturno.email})"><i class="fas fa-copy"></i></button>`
+            : '';
+
+        return `
+            <div class="agente-role-block">
+                <div class="contact-3col-row diurno">
+                    <div class="contact-col-role">
+                        <div class="contact-role-title"><i class="${iconClass}"></i> ${roleTitle}:</div>
+                        <div class="contact-shift-wrap">
+                            <span class="shift-tag shift-diurno"><i class="fas fa-sun"></i> Diurno</span>
+                        </div>
+                    </div>
+                    <div class="contact-col-person">
+                        <span class="contact-name-value ${parsed.diurno.nome === 'sem contato' ? 'sem-contato' : ''}">${parsed.diurno.nome}</span>
+                        <div class="contact-email-row">
+                            <span class="contact-email-value ${hasDiurnoEmail ? '' : 'sem-contato'}"><i class="fas fa-envelope"></i> ${hasDiurnoEmail ? parsed.diurno.email : '...'}</span>
+                            ${copyBtnEmailDiurno}
+                        </div>
+                    </div>
+                    <div class="contact-col-phone">
+                        <div class="contact-tel-row">
+                            <span class="contact-tel-value ${parsed.diurno.telefone === 'sem contato' ? 'sem-contato' : ''}">${parsed.diurno.telefone}</span>
+                            ${copyBtnDiurno}
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-3col-row noturno">
+                    <div class="contact-col-role">
+                        <div class="contact-role-title"><i class="${iconClass}"></i> ${roleTitle}:</div>
+                        <div class="contact-shift-wrap">
+                            <span class="shift-tag shift-noturno"><i class="fas fa-moon"></i> Noturno</span>
+                        </div>
+                    </div>
+                    <div class="contact-col-person">
+                        <span class="contact-name-value ${parsed.noturno.nome === 'sem contato' ? 'sem-contato' : ''}">${parsed.noturno.nome}</span>
+                        <div class="contact-email-row">
+                            <span class="contact-email-value ${hasNoturnoEmail ? '' : 'sem-contato'}"><i class="fas fa-envelope"></i> ${hasNoturnoEmail ? parsed.noturno.email : '...'}</span>
+                            ${copyBtnEmailNoturno}
+                        </div>
+                    </div>
+                    <div class="contact-col-phone">
+                        <div class="contact-tel-row">
+                            <span class="contact-tel-value ${parsed.noturno.telefone === 'sem contato' ? 'sem-contato' : ''}">${parsed.noturno.telefone}</span>
+                            ${copyBtnNoturno}
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+    };
+
+    const renderSpreadsheet = (list, autoExpand = false) => {
+        const resultsContainer = document.getElementById('agente-search-results');
+        if (!resultsContainer) return;
+        resultsContainer.innerHTML = '';
+
+        if (!list || list.length === 0) {
+            resultsContainer.innerHTML = '<p style="text-align: center; opacity: 0.7; margin-top: 30px; font-size: 1.2em;">Nenhum município ou contato encontrado.</p>';
             return;
         }
 
-        const formatContact = (text) => text ? text.replace(/\s*(?=(?:015)?\(\d{2}\))/, ' - ') : '';
-        const extractPhone = (text) => {
-            if (!text) return '';
-            const match = text.match(/\(?\d{2}\)?\s?\d{4,5}[-\s]?\d{4}/);
-            return match ? match[0].replace(/\(|\)|\s|-/g, '') : '';
-        };
+        const fragment = document.createDocumentFragment();
 
-        const copyPhone = async (phone, element) => {
-            try {
-                await navigator.clipboard.writeText(phone);
-                const originalIcon = element.innerHTML;
-                element.innerHTML = '<i class="fas fa-check"></i>';
-                element.style.color = '#4CAF50';
-                setTimeout(() => {
-                    element.innerHTML = originalIcon;
-                    element.style.color = '';
-                }, 1500);
-            } catch (err) { console.error('Erro ao copiar:', err); }
-        };
+        list.forEach(item => {
+            const card = document.createElement('div');
+            card.className = autoExpand ? 'agente-spreadsheet-card' : 'agente-spreadsheet-card collapsed';
 
-        filtered.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'agente-result-card';
-            const supPhone = extractPhone(item.supervisor);
-            const coordPhone = extractPhone(item.coordenador);
-            const gerentePhone = extractPhone(item.gerente);
+            const siglaTagHTML = item.sigla && item.sigla !== 'N/A'
+                ? `<span class="agente-tag-sigla">${item.sigla}</span>`
+                : '';
 
-            let contentHTML = `
-                <div class="agente-card-header">
-                    <strong>${item.municipio} <span>(${item.uf})</span></strong>
-                    ${activeAgenteSource === 'fibrasil' ? `<span>${item.sigla}</span>` : ''}
+            const filaTagHTML = item.fila
+                ? `<span class="agente-tag-fila"><i class="fas fa-layer-group"></i> ${item.fila}</span>`
+                : '';
+
+            const epsName = item.eps || (item.epsData && item.epsData.eps) || 'EPS';
+
+            // Coluna VIVO
+            const vivo = item.vivoData || {};
+            const vivoSup = vivo.supervisorVivo !== undefined ? vivo.supervisorVivo : vivo.supervisor;
+            const vivoSupEmail = vivo.emailSupervisorVivo || '';
+            const vivoCoord = vivo.coordenadorVivo !== undefined ? vivo.coordenadorVivo : vivo.coordenador;
+            const vivoCoordEmail = vivo.emailCoordenadorVivo || '';
+            const vivoGer = vivo.gerenteVivo !== undefined ? vivo.gerenteVivo : vivo.gerente;
+            const vivoGerEmail = vivo.emailGerenteVivo || '';
+
+            const vivoHTML = `
+                <div class="agente-col-vivo">
+                    <div class="agente-col-vivo-header">
+                        <i class="fas fa-signal"></i>
+                        <span>VIVO</span>
+                    </div>
+                    ${renderContactBlock('Supervisor', 'fas fa-user-check', vivoSup, true, vivoSupEmail)}
+                    ${renderContactBlock('Coordenador', 'fas fa-user-tie', vivoCoord, true, vivoCoordEmail)}
+                    ${renderContactBlock('Gerente', 'fas fa-user-shield', vivoGer, true, vivoGerEmail)}
                 </div>`;
 
-            if (activeAgenteSource === 'fibrasil') {
-                contentHTML += `
-                    <div class="agente-card-body">
-                        <div><i class="fas fa-layer-group"></i> ${item.fila}</div>
-                        <div><i class="fas fa-hard-hat"></i> EPS: ${item.eps}</div>
-                    </div>`;
+            // Coluna EPS
+            const eps = item.epsData || {};
+            const primeiroContatoHTML = eps.primeiroContato
+                ? renderContactBlock('1º Contato', 'fas fa-headset', eps.primeiroContato, false, eps.emailPrimeiroContato || '')
+                : '';
+
+            const epsHTML = `
+                <div class="agente-col-eps">
+                    <div class="agente-col-eps-header">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-hard-hat"></i>
+                            <span>${epsName.toUpperCase()}</span>
+                        </div>
+                    </div>
+                    ${primeiroContatoHTML}
+                    ${renderContactBlock('Supervisor', 'fas fa-user-check', eps.supervisor, false, eps.emailSupervisor || '')}
+                    ${renderContactBlock('Coordenador', 'fas fa-user-tie', eps.coordenador, false, eps.emailCoordenador || '')}
+                    ${renderContactBlock('Gerente', 'fas fa-user-shield', eps.gerente, false, eps.emailGerente || '')}
+                </div>`;
+
+            card.innerHTML = `
+                <div class="agente-city-header" title="Clique para expandir ou recolher os contatos">
+                    <div class="agente-city-title">
+                        <i class="fas fa-map-marker-alt" style="color: var(--accent-color);"></i>
+                        ${item.municipio} <span style="opacity: 0.85; font-size: 0.85em;">(${item.uf})</span>
+                        ${siglaTagHTML}
+                    </div>
+                    <div class="agente-city-tags">
+                        ${filaTagHTML}
+                        <span class="agente-toggle-badge"><i class="fas fa-chevron-down agente-toggle-chevron"></i></span>
+                    </div>
+                </div>
+                <div class="agente-grid-columns">
+                    ${vivoHTML}
+                    ${epsHTML}
+                </div>`;
+
+            // Evento para expandir/recolher ao clicar no cabeçalho
+            const header = card.querySelector('.agente-city-header');
+            if (header) {
+                header.addEventListener('click', (e) => {
+                    if (e.target.closest('button')) return;
+                    card.classList.toggle('collapsed');
+                });
             }
 
-            contentHTML += `
-                <div class="agente-card-contacts">
-                    <div>
-                        <i class="fas fa-user-check"></i> Sup: ${formatContact(item.supervisor)}
-                        ${supPhone ? `<span class="copy-phone" data-phone="${supPhone}" title="Clique para copiar"><i class="fas fa-copy"></i></span>` : ''}
-                    </div>
-                    <div>
-                        <i class="fas fa-user-tie"></i> Coord: ${formatContact(item.coordenador)}
-                        ${coordPhone ? `<span class="copy-phone" data-phone="${coordPhone}" title="Clique para copiar"><i class="fas fa-copy"></i></span>` : ''}
-                    </div>
-                    <div>
-                        <i class="fas fa-user-shield"></i> Gerente: ${formatContact(item.gerente)}
-                        ${gerentePhone ? `<span class="copy-phone" data-phone="${gerentePhone}" title="Clique para copiar"><i class="fas fa-copy"></i></span>` : ''}
-                    </div>
-                </div>`;
-            
-            div.innerHTML = contentHTML;
-            resultsContainer.appendChild(div);
+            fragment.appendChild(card);
         });
 
-        document.querySelectorAll('.copy-phone').forEach(btn => {
+        resultsContainer.appendChild(fragment);
+
+        // Adicionar eventos aos botões de cópia
+        resultsContainer.querySelectorAll('.copy-phone-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                copyPhone(btn.getAttribute('data-phone'), btn);
+                copyPhoneToClipboard(btn.getAttribute('data-phone'), btn);
             });
         });
+    };
+
+    const searchAgente = (e) => {
+        const term = e.target.value.toLowerCase().trim();
+        if (!term) {
+            renderSpreadsheet(unifiedCities, false);
+            return;
+        }
+
+        const filtered = unifiedCities.filter(item => {
+            const munMatch = (item.municipio || '').toLowerCase().includes(term);
+            const ufMatch = (item.uf || '').toLowerCase().includes(term);
+            const siglaMatch = (item.sigla || '').toLowerCase().includes(term);
+            const epsMatch = (item.eps || '').toLowerCase().includes(term);
+            const filaMatch = (item.fila || '').toLowerCase().includes(term);
+
+            const vivo = item.vivoData || {};
+            const vivoMatch = Object.values(vivo).some(v => String(v).toLowerCase().includes(term));
+
+            const eps = item.epsData || {};
+            const epsContactMatch = Object.values(eps).some(v => String(v).toLowerCase().includes(term));
+
+            return munMatch || ufMatch || siglaMatch || epsMatch || filaMatch || vivoMatch || epsContactMatch;
+        });
+
+        renderSpreadsheet(filtered, true);
+    };
+
+    window.toggleAllCities = (expand) => {
+        document.querySelectorAll('.agente-spreadsheet-card').forEach(card => {
+            if (expand) card.classList.remove('collapsed');
+            else card.classList.add('collapsed');
+        });
+    };
+
+    const openAgenteRapidoModal = (event) => {
+        if (event && event.preventDefault) event.preventDefault();
+        window.navigateTo('escalonamento');
+    };
+
+    const closeAgenteRapidoModal = (event) => {
+        if (event && event.preventDefault) event.preventDefault();
+        window.navigateTo('links-cope');
     };
 
     // --- Funções de Importação e Exportação ---
 
-    function exportarContatosCSV(exportarTodos = false) {
-        let dadosParaExportar;
-        let nomeArquivo = 'contatos.csv';
+    function exportarContatosCSV(exportarTodos = true) {
+        const dadosParaExportar = unifiedCities.map(item => {
+            const vivo = item.vivoData || {};
+            const eps = item.epsData || {};
+            const supVivo = parseContact(vivo.supervisorVivo !== undefined ? vivo.supervisorVivo : vivo.supervisor, vivo.emailSupervisorVivo);
+            const coordVivo = parseContact(vivo.coordenadorVivo !== undefined ? vivo.coordenadorVivo : vivo.coordenador, vivo.emailCoordenadorVivo);
+            const gerVivo = parseContact(vivo.gerenteVivo !== undefined ? vivo.gerenteVivo : vivo.gerente, vivo.emailGerenteVivo);
 
-        if (exportarTodos) {
-            // Combina, remove duplicatas e exporta tudo
-            const todosContatosMap = new Map();
-            
-            // Adiciona Fibrasil primeiro
-            baseDadosFibra.forEach(item => {
-                const key = `${item.municipio.toUpperCase().trim()}-${item.uf.toUpperCase().trim()}`;
-                if (!todosContatosMap.has(key)) {
-                    todosContatosMap.set(key, item);
-                }
-            });
+            const supEps = parseContact(eps.supervisor, eps.emailSupervisor);
+            const coordEps = parseContact(eps.coordenador, eps.emailCoordenador);
+            const gerEps = parseContact(eps.gerente, eps.emailGerente);
 
-            // Adiciona Vivo (já processado), sobrescrevendo ou adicionando
-            escalaVivoProcessada.forEach(item => {
-                const key = `${item.municipio.toUpperCase().trim()}-${item.uf.toUpperCase().trim()}`;
-                todosContatosMap.set(key, { ...todosContatosMap.get(key), ...item });
-            });
-
-            dadosParaExportar = Array.from(todosContatosMap.values());
-            nomeArquivo = 'contatos_completos.csv';
-            
-        } else {
-            if (!activeAgenteSource) {
-                alert("Por favor, selecione uma fonte de dados (FIBRASIL ou VIVO) para exportar.");
-                return;
-            }
-            dadosParaExportar = activeAgenteSource === 'fibrasil' ? baseDadosFibra : escalaVivoProcessada;
-            nomeArquivo = `contatos_${activeAgenteSource}.csv`;
-        }
-
-        if (!dadosParaExportar || dadosParaExportar.length === 0) {
-            alert("Não há dados para exportar.");
-            return;
-        }
+            return {
+                Municipio: item.municipio,
+                UF: item.uf,
+                Sigla: item.sigla,
+                Fila: item.fila,
+                EPS: item.eps,
+                VIVO_Supervisor_Diurno: `${supVivo.diurno.nome} (${supVivo.diurno.telefone})`,
+                VIVO_Supervisor_Diurno_Email: supVivo.diurno.email,
+                VIVO_Supervisor_Noturno: `${supVivo.noturno.nome} (${supVivo.noturno.telefone})`,
+                VIVO_Supervisor_Noturno_Email: supVivo.noturno.email,
+                VIVO_Coordenador_Diurno: `${coordVivo.diurno.nome} (${coordVivo.diurno.telefone})`,
+                VIVO_Coordenador_Diurno_Email: coordVivo.diurno.email,
+                VIVO_Coordenador_Noturno: `${coordVivo.noturno.nome} (${coordVivo.noturno.telefone})`,
+                VIVO_Coordenador_Noturno_Email: coordVivo.noturno.email,
+                VIVO_Gerente_Diurno: `${gerVivo.diurno.nome} (${gerVivo.diurno.telefone})`,
+                VIVO_Gerente_Diurno_Email: gerVivo.diurno.email,
+                VIVO_Gerente_Noturno: `${gerVivo.noturno.nome} (${gerVivo.noturno.telefone})`,
+                VIVO_Gerente_Noturno_Email: gerVivo.noturno.email,
+                EPS_Supervisor_Diurno: `${supEps.diurno.nome} (${supEps.diurno.telefone})`,
+                EPS_Supervisor_Diurno_Email: supEps.diurno.email,
+                EPS_Supervisor_Noturno: `${supEps.noturno.nome} (${supEps.noturno.telefone})`,
+                EPS_Supervisor_Noturno_Email: supEps.noturno.email,
+                EPS_Coordenador_Diurno: `${coordEps.diurno.nome} (${coordEps.diurno.telefone})`,
+                EPS_Coordenador_Diurno_Email: coordEps.diurno.email,
+                EPS_Coordenador_Noturno: `${coordEps.noturno.nome} (${coordEps.noturno.telefone})`,
+                EPS_Coordenador_Noturno_Email: coordEps.noturno.email,
+                EPS_Gerente_Diurno: `${gerEps.diurno.nome} (${gerEps.diurno.telefone})`,
+                EPS_Gerente_Diurno_Email: gerEps.diurno.email,
+                EPS_Gerente_Noturno: `${gerEps.noturno.nome} (${gerEps.noturno.telefone})`,
+                EPS_Gerente_Noturno_Email: gerEps.noturno.email
+            };
+        });
 
         const csv = Papa.unparse(dadosParaExportar);
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         const url = URL.createObjectURL(blob);
         link.setAttribute("href", url);
-        link.setAttribute("download", nomeArquivo);
+        link.setAttribute("download", "escalonamento_centralizado_vivo_eps.csv");
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
@@ -785,20 +1273,33 @@ function initAgenteRapido() {
     function importarContatos() {
         const input = document.createElement('input');
         input.type = 'file';
-        input.accept = '.json';
-        input.onchange = e => {
+        input.accept = '.json,.csv';
+        input.onchange = (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = event => {
+            reader.onload = (event) => {
                 try {
-                    const novosContatos = JSON.parse(event.target.result);
-                    // Adiciona os novos contatos à base principal
-                    escalonamentoCompleto.push(...novosContatos);
-                    // Reprocessa a base da VIVO para incluir os novos dados e remover duplicatas
-                    escalaVivoProcessada = processarDadosVivo();
-                    alert(`${novosContatos.length} contatos importados com sucesso! A lista foi atualizada.`);
+                    const content = event.target.result;
+                    if (file.name.endsWith('.json')) {
+                        const data = JSON.parse(content);
+                        const novosContatos = Array.isArray(data) ? data : [data];
+                        escalonamentoEPS.push(...novosContatos);
+                        unifiedCities = buildUnifiedCities();
+                        window.unifiedCities = unifiedCities;
+                        renderSpreadsheet(unifiedCities);
+                        alert(`${novosContatos.length} contatos importados com sucesso!`);
+                    } else if (file.name.endsWith('.csv') && typeof Papa !== 'undefined') {
+                        const parsed = Papa.parse(content, { header: true, skipEmptyLines: true });
+                        if (parsed.data && parsed.data.length > 0) {
+                            escalonamentoEPS.push(...parsed.data);
+                            unifiedCities = buildUnifiedCities();
+                            window.unifiedCities = unifiedCities;
+                            renderSpreadsheet(unifiedCities);
+                            alert(`${parsed.data.length} contatos importados com sucesso do CSV!`);
+                        }
+                    }
                 } catch (error) {
                     alert(`Erro ao importar o arquivo: ${error.message}`);
                 }
@@ -808,9 +1309,29 @@ function initAgenteRapido() {
         input.click();
     }
 
-    openBtn.addEventListener('dblclick', openAgenteRapidoModal);
-    closeBtn.addEventListener('click', closeAgenteRapidoModal);
-    document.getElementById('btn-agente-fibrasil').addEventListener('click', () => setAgenteSource('fibrasil'));
-    document.getElementById('btn-agente-vivo').addEventListener('click', () => setAgenteSource('vivo'));
-    document.getElementById('agente-search-input').addEventListener('input', searchAgente);
+    window.openAgenteRapidoModal = openAgenteRapidoModal;
+    window.closeAgenteRapidoModal = closeAgenteRapidoModal;
+    window.searchAgente = searchAgente;
+    window.exportarContatosCSV = exportarContatosCSV;
+    window.importarContatos = importarContatos;
+    window.renderSpreadsheet = renderSpreadsheet;
+    window.buildUnifiedCities = buildUnifiedCities;
+    window.unifiedCities = unifiedCities;
+
+    if (openBtn) {
+        openBtn.addEventListener('click', (e) => { e.preventDefault(); openAgenteRapidoModal(e); });
+        openBtn.addEventListener('dblclick', (e) => { e.preventDefault(); openAgenteRapidoModal(e); });
+    }
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeAgenteRapidoModal);
+    }
+
+    const searchInput = document.getElementById('agente-search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', searchAgente);
+        searchInput.addEventListener('keyup', searchAgente);
+    }
+
+    // Renderiza dados na inicialização (minimizado por padrão para alta performance)
+    renderSpreadsheet(unifiedCities, false);
 }
