@@ -65,15 +65,29 @@
             <h1 style="color: #FF8C00; text-align: center; margin-bottom: 50px; font-size: 4em; font-weight: bold;">COPE</h1>
 
             <div class="card-container">
-                <a href="#" onclick="showEnvioModal(event)" class="card card-link card-orange">
-                    <h2>ENVIO PARCIAL</h2>
-                    <p>Envio Automatizado.</p>
+                <a href="#" onclick="showEnvioModal(event)" class="card-link" aria-label="Abrir ENVIO PARCIAL">
+                    <div class="card card-orange card-bg-custom card-parcial">
+                        <div class="card-bg-image-wrapper">
+                            <img src="parcial.png" alt="Pré-visualização Envio Parcial" class="card-bg-image card-bg-image-centered" onerror="this.style.display='none'">
+                            <div class="card-bg-overlay"></div>
+                        </div>
+                        <div class="card-front-content">
+                            <h2>ENVIO PARCIAL</h2>
+                            <p>Envio Automatizado.</p>
+                        </div>
+                    </div>
                 </a>
 
-                <a class="card-link" href="https://fibrasilferramentas.padtec.com.br/salasdecrise/" aria-label="Abrir SALA DE CRISE">
-                    <div class="card card-orange">
-                        <h2>SALA DE CRISE</h2>
-                        <p>Relatórios Salas de Crise - COPE</p>
+                <a class="card-link" href="https://fibrasilferramentas.padtec.com.br/salasdecrise/" target="_blank" rel="noopener noreferrer" aria-label="Abrir SALA DE CRISE">
+                    <div class="card card-orange card-sala-crise">
+                        <div class="card-bg-image-wrapper">
+                            <img src="Salas de Crise.png" alt="Pré-visualização Sala de Crise" class="card-bg-image" onerror="this.style.display='none'">
+                            <div class="card-bg-overlay"></div>
+                        </div>
+                        <div class="card-front-content">
+                            <h2>SALA DE CRISE</h2>
+                            <p>Relatórios Salas de Crise - COPE</p>
+                        </div>
                     </div>
                 </a>
 
@@ -84,38 +98,11 @@
                     </div>
                 </a>
 
-                <a class="card-link" href="https://padtec.sharepoint.com/:x:/r/sites/OperacoesFiBrasil/_layouts/15/Doc.aspx?sourcedoc=%7B5B86580C-689D-49DD-9AAD-3F25C0AC1CDE%7D&file=Tabula%C3%A7%C3%A3o%20Acionamento%20GOLF%20(Escolta).xlsx&action=default&mobileredirect=true&isSPOFile=1&ovuser=5619e9f2-1be6-47b9-8f69-06404094db57%2Cjssantos%40padtec.com.br&clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI0OS8yNTA1MDQwMTYyNCIsIkhhc0ZlZGVyYXRlZFVzZXIiOmZhbHNlfQ%3D%3D" target="_blank" rel="noopener noreferrer" aria-label="Abrir ACIONAMENTO GOLF">
-                    <div class="card card-orange">
-                        <h2>ACIONAMENTO GOLF</h2>
-                        <p>Tabulação Acionamento GOLF (Escolta)</p>
-                    </div>
-                </a>
-
-                <a class="card-link" href="https://padtec.sharepoint.com/:x:/r/sites/OperacoesFiBrasil/_layouts/15/Doc.aspx?sourcedoc=%7B5820AB68-D551-48C0-BB19-56F245F0C1F2%7D&file=Tabula%C3%A7%C3%A3o%20Acionamento%20Supervis%C3%A3o%20e%20Coordena%C3%A7%C3%A3o%20FiBrasil.xlsx&action=default&mobileredirect=true&isSPOFile=1&ovuser=5619e9f2-1be6-47b9-8f69-06404094db57%2Cjssantos%40padtec.com.br&clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI0OS8yNTA1MDQwMTYyNCIsIkhhc0ZlZGVyYXRlZFVzZXIiOmZhbHNlfQ%3D%3D" target="_blank" rel="noopener noreferrer" aria-label="Abrir TABULAÇÃO ACIONAMENTO FIBRASIL">
-                    <div class="card card-orange">
-                        <h2>TABULAÇÃO ACIONAMENTO FIBRASIL</h2>
-                        <p>Planilha de Tabulação - FiBrasil</p>
-                    </div>
-                </a>
-
-                <a class="card-link" href="https://padtec.sharepoint.com/:x:/r/sites/OperacoesFiBrasil/_layouts/15/Doc.aspx?sourcedoc=%7BCBB8CB2E-B28E-4A0D-BF42-FF3DF3992D95%7D&file=Status%20Di%C3%A1rio.xlsx&action=default&mobileredirect=true" target="_blank" rel="noopener noreferrer" aria-label="Abrir STATUS DIARIO">
-                    <div class="card card-orange">
-                        <h2>STATUS DIARIO</h2>
-                        <p>Status Diário - COPE</p>
-                    </div>
-                </a>
-
                 <a class="card-link" href="https://padtec.sharepoint.com/:x:/r/sites/OperacoesFiBrasil/_layouts/15/Doc.aspx?sourcedoc=%7B16D8374A-31DA-4DCC-B49C-F3EFA39705F1%7D&file=Auditoria.xlsx&action=default&mobileredirect=true" target="_blank" rel="noopener noreferrer" aria-label="Abrir AUDITORIA">
                     <div class="card card-orange">
                         <h2>AUDITORIA</h2>
                         <p>Planilha Auditoria</p>
                     </div>
-                </a>
-
-                <a href="#" onclick="navigateTo('escalonamento'); return false;" class="card card-link card-blue" aria-label="Abrir Escalonamento Centralizado">
-                    <span class="badge-atualizado">ATUALIZADO</span>
-                    <h2>Escalonamento Centralizado</h2>
-                    <p>Consulta e comparativo de contatos de escalonamento VIVO e EPS.</p>
                 </a>
             </div>
         </section>
@@ -125,10 +112,12 @@
             <h1 style="color: #00b7ff; text-align: center; margin-bottom: 50px; font-size: 4em; font-weight: bold;">LINKS VIVO | FIBRASIL</h1>
 
             <div class="card-container">
-                <a href="#" onclick="navigateTo('escalonamento'); return false;" class="card card-link card-blue" aria-label="Abrir Escalonamento Centralizado">
-                    <span class="badge-atualizado">ATUALIZADO</span>
-                    <h2>Escalonamento Centralizado</h2>
-                    <p>Consulta e comparativo de contatos de escalonamento VIVO e EPS.</p>
+                <a href="#" onclick="navigateTo('escalonamento'); return false;" class="card-link" aria-label="Abrir Escalonamento Centralizado">
+                    <div class="card card-blue">
+                        <span class="badge-atualizado">ATUALIZADO</span>
+                        <h2>Escalonamento Centralizado</h2>
+                        <p>Consulta e comparativo de contatos de escalonamento VIVO e EPS.</p>
+                    </div>
                 </a>
 
                 <a class="card-link" href="https://app.powerbi.com/groups/me/apps/6506522b-dc4a-47fb-9fb7-d785bac4c40d/reports/faf20964-4999-4b72-af50-7251726fcb60/7fd4ff817170b19d1a60?ctid=df1b464d-c105-4b6b-95c1-c07df632da76&experience=power-bi" target="_blank" rel="noopener noreferrer" aria-label="Abrir BI Indisponibilidade">
@@ -213,15 +202,15 @@
                     </div>
                 </div>
                 <div class="escalonamento-header-actions">
-                    <button class="agente-btn-action" onclick="toggleAllCities(true)" title="Expandir todas as cidades"><i class="fas fa-expand-alt"></i> <span>Expandir</span></button>
-                    <button class="agente-btn-action" onclick="toggleAllCities(false)" title="Recolher todas as cidades"><i class="fas fa-compress-alt"></i> <span>Recolher</span></button>
+                    <button class="agente-btn-action" onclick="toggleAllFilas(true)" title="Expandir todas as filas"><i class="fas fa-expand-alt"></i> <span>Expandir</span></button>
+                    <button class="agente-btn-action" onclick="toggleAllFilas(false)" title="Recolher todas as filas"><i class="fas fa-compress-alt"></i> <span>Recolher</span></button>
                     <button class="agente-btn-action" onclick="exportarContatosCSV(true)" title="Exportar dados de Escalonamento em CSV"><i class="fas fa-file-csv"></i> <span>Exportar CSV</span></button>
                 </div>
             </div>
 
             <div class="agente-search-box">
                 <i class="fas fa-search" style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #c084fc; font-size: 1.25em;"></i>
-                <input type="text" id="agente-search-input" oninput="if(window.searchAgente){window.searchAgente(event);}" onkeyup="if(window.searchAgente){window.searchAgente(event);}" placeholder="Pesquise por município, UF, sigla ou EPS (ex: Alegrete, RS, ALG, Razao Info)..." autocomplete="off">
+                <input type="text" id="agente-search-input" oninput="if(window.searchAgente){window.searchAgente(event);}" onkeyup="if(window.searchAgente){window.searchAgente(event);}" placeholder="Pesquise por fila, município, UF, sigla ou EPS (ex: Planta externa N1 / AM, Alegrete, RS)..." autocomplete="off">
             </div>
 
             <div id="agente-search-results" class="agente-results-page-container"></div>
